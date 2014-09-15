@@ -1,6 +1,4 @@
 
-use std::num::pow;
-
 use graphics::ImageSize;
 use graphics::vecmath::Scalar;
 
@@ -10,6 +8,7 @@ use event::{
     Running,
 };
 
+use EaseFunction;
 use Sprite;
 
 /// Actions supported by Sprite
@@ -63,30 +62,10 @@ pub enum Action {
     ///
     /// Set the sprite's opacity to specified value in `dt` seconds
     FadeTo(f64, f64),
-    /// action
+    /// ease_function, action
     ///
-    /// Tweening the action with Quadratic Easing
-    EaseIn(Box<Action>),
-    /// action
-    ///
-    /// Tweening the action with Quadratic Easing
-    EaseOut(Box<Action>),
-    /// action
-    ///
-    /// Tweening the action with Quadratic Easing
-    EaseInOut(Box<Action>),
-    /// rate, action
-    ///
-    /// Tweening the action with specified rate
-    EaseRateIn(uint, Box<Action>),
-    /// rate, action
-    ///
-    /// Tweening the action with specified rate
-    EaseRateOut(uint, Box<Action>),
-    /// rate, action
-    ///
-    /// Tweening the action with specified rate
-    EaseRateInOut(uint, Box<Action>),
+    /// Tweening the action with ease function
+    Ease(EaseFunction, Box<Action>),
     /// A empty action
     EmptyAction,
 }
@@ -152,23 +131,8 @@ impl Action {
                 let b = sprite.opacity() as f64;
                 FadeState(0.0, b, d - b, dur)
             },
-            EaseIn(ref action) => {
-                EaseRateState(true, false, 2, box action.to_state(sprite))
-            },
-            EaseOut(ref action) => {
-                EaseRateState(false, true, 2, box action.to_state(sprite))
-            },
-            EaseInOut(ref action) => {
-                EaseRateState(true, true, 2, box action.to_state(sprite))
-            },
-            EaseRateIn(rate, ref action) => {
-                EaseRateState(true, false, rate, box action.to_state(sprite))
-            },
-            EaseRateOut(rate, ref action) => {
-                EaseRateState(false, true, rate, box action.to_state(sprite))
-            },
-            EaseRateInOut(rate, ref action) => {
-                EaseRateState(true, true, rate, box action.to_state(sprite))
+            Ease(f, ref action) => {
+                EaseState(f, box action.to_state(sprite))
             },
             _ => {
                 EmptyState
@@ -194,8 +158,8 @@ pub enum ActionState {
     BlinkState(f64, f64, uint, uint),
     /// time, begin, change, duration
     FadeState(f64, f64, f64, f64),
-    /// in, out, rate, state
-    EaseRateState(bool, bool, uint, Box<ActionState>),
+    /// ease_function, action
+    EaseState(EaseFunction, Box<ActionState>),
     /// An empty state
     EmptyState,
 }
@@ -245,23 +209,23 @@ impl ActionState {
                 let factor = (t + dt) / d;
                 update_opacity(sprite, factor, t + dt, b, c, d)
             },
-            EaseRateState(ease_in, ease_out, rate, ref state) => {
+            EaseState(f, ref state) => {
                 let mut support_ease = true;
                 let (state, status, remain) = match *state {
                     box MoveState(t, bx, by, cx, cy, d) => {
-                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        let factor = f.calc((t + dt) / d);
                         update_position(sprite, factor, t + dt, bx, by, cx, cy, d)
                     },
                     box RotateState(t, b, c, d) => {
-                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        let factor = f.calc((t + dt) / d);
                         update_rotation(sprite, factor, t + dt, b, c, d)
                     },
                     box ScaleState(t, bx, by, cx, cy, d) => {
-                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        let factor = f.calc((t + dt) / d);
                         update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
                     },
                     box FadeState(t, b, c, d) => {
-                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        let factor = f.calc((t + dt) / d);
                         update_opacity(sprite, factor, t + dt, b, c, d)
                     },
                     _ => {
@@ -279,7 +243,7 @@ impl ActionState {
                         (EmptyState, status, remain)
                     },
                     _ => {
-                        (EaseRateState(ease_in, ease_out, rate, box state),
+                        (EaseState(f, box state),
                          status, remain)
                     },
                 }
@@ -330,23 +294,6 @@ fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: 
         sprite.set_opacity((b + c * factor) as f32);
         (FadeState(t, b, c, d),
          Running, 0.0)
-    }
-}
-
-fn calc_factor_for_ease_rate(ease_in: bool, ease_out: bool, rate: uint, t: f64, d: f64) -> f64 {
-    if ease_in && !ease_out{
-        // ease in
-        pow(t / d, rate)
-    } else if !ease_in && ease_out {
-        // ease out
-        1.0 - pow(1.0 - t / d, rate)
-    } else {
-        // ease in out
-        if t / d <= 0.5 {
-            calc_factor_for_ease_rate(true, false, rate, t, d / 2.0) / 2.0
-        } else {
-            0.5 + calc_factor_for_ease_rate(false, true, rate, t - d / 2.0, d / 2.0) / 2.0
-        }
     }
 }
 
