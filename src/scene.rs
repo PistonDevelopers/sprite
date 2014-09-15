@@ -23,7 +23,7 @@ use action::{
 pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, uint>,
-    running: HashMap<Uuid, Vec<(State<Action>, ActionState)>>,
+    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action>, ActionState)>>,
 }
 
 impl<I: ImageSize> Scene<I> {
@@ -45,7 +45,7 @@ impl<I: ImageSize> Scene<I> {
         for (id, actions) in running.move_iter() {
             let mut new_actions = Vec::new();
 
-            for (mut a, mut s) in actions.move_iter() {
+            for (b, mut a, mut s) in actions.move_iter() {
                 let sprite = self.child_mut(id).unwrap();
                 let (status, _) = a.update(e, |dt, action| {
                     match s {
@@ -60,7 +60,7 @@ impl<I: ImageSize> Scene<I> {
                 match status {
                     // the behavior is still running, add it for next update
                     Running => {
-                        new_actions.push((a.clone(), s));
+                        new_actions.push((b, a.clone(), s));
                     },
                     _ => {},
                 }
@@ -80,9 +80,85 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Register action with sprite
-    pub fn run_action(&mut self, sprite_id: Uuid, action: Behavior<Action>) {
+    pub fn run_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
         let actions = self.running.find_or_insert_with(sprite_id, |_| Vec::new());
-        actions.push((State::new(action), EmptyState));
+        let state = State::new(action.clone());
+        actions.push((action.clone(), state, EmptyState));
+    }
+
+    fn find_action(&self, sprite_id: Uuid, action: &Behavior<Action>) -> Option<uint> {
+        let mut index = None;
+        match self.running.find(&sprite_id) {
+            Some(actions) => {
+                for i in range(0, actions.len()) {
+                    let (ref b, _, _) = actions[i];
+                    if b == action {
+                        index = Some(i);
+                        break;
+                    }
+                }
+            },
+            _ => {},
+        }
+        index
+    }
+
+    /// Pause a running action of the sprite
+    pub fn pause_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find_action(sprite_id, action);
+        if index.is_some() {
+            println!("found");
+            let i = index.unwrap();
+            let actions = self.running.get_mut(&sprite_id);
+            let (b, s, action_state) = actions.remove(i).unwrap();
+            actions.push((b, s, action_state.pause()));
+        }
+    }
+
+    /// Resume a paused action of the sprite
+    pub fn resume_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find_action(sprite_id, action);
+        if index.is_some() {
+            println!("found");
+            let i = index.unwrap();
+            let actions = self.running.get_mut(&sprite_id);
+            let (b, s, action_state) = actions.remove(i).unwrap();
+            actions.push((b, s, action_state.resume()));
+        }
+    }
+
+    /// Toggle an action of the sprite
+    pub fn toggle_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find_action(sprite_id, action);
+        if index.is_some() {
+            let i = index.unwrap();
+            let actions = self.running.get_mut(&sprite_id);
+            let (b, s, action_state) = actions.remove(i).unwrap();
+            actions.push((b, s, action_state.toggle()));
+        }
+    }
+
+    /// Stop a running action of the sprite
+    pub fn stop_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find_action(sprite_id, action);
+        if index.is_some() {
+            let i = index.unwrap();
+            self.running.get_mut(&sprite_id).remove(i);
+        }
+    }
+
+    /// Stop all running actions of the sprite
+    pub fn stop_all_actions(&mut self, sprite_id: Uuid) {
+        self.running.remove(&sprite_id);
+    }
+
+    /// Get all the running actions in the scene
+    pub fn running_actions(&self) -> uint {
+        let mut total = 0;
+        for (_, actions) in self.running.iter() {
+            total += actions.len();
+        }
+        total
     }
 
     /// Add sprite to scene

@@ -5,7 +5,7 @@ use std::f64::consts::{
 };
 
 #[allow(missing_doc)]
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq)]
 pub enum EaseFunction {
     EaseQuadraticIn,
     EaseQuadraticOut,

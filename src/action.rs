@@ -12,7 +12,7 @@ use EaseFunction;
 use Sprite;
 
 /// Actions supported by Sprite
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq)]
 pub enum Action {
     /// duration, x, y
     ///
@@ -162,9 +162,35 @@ pub enum ActionState {
     EaseState(EaseFunction, Box<ActionState>),
     /// An empty state
     EmptyState,
+    /// An action is paused
+    PausedState(Box<ActionState>),
 }
 
 impl ActionState {
+    /// Pause an action
+    pub fn pause(&self) -> ActionState {
+        match *self {
+            PausedState(_) => self.clone(),
+            _ => PausedState(box self.clone())
+        }
+    }
+
+    /// Resume an action
+    pub fn resume(&self) -> ActionState {
+        match *self {
+            PausedState(ref state) => (**state).clone(),
+            _ => self.clone()
+        }
+    }
+
+    /// Toggle between paused state and running state
+    pub fn toggle(&self) -> ActionState {
+        match *self {
+            PausedState(ref state) => (**state).clone(),
+            _ => PausedState(box self.clone())
+        }
+    }
+
     /// Update the state and change the sprite's properties
     pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (ActionState, Status, f64) {
         match *self {
@@ -248,7 +274,7 @@ impl ActionState {
                     },
                 }
             },
-            _ => { (EmptyState, Success, dt) },
+            _ => { (self.clone(), Running, dt) },
         }
     }
 }
