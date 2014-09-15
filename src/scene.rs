@@ -169,7 +169,49 @@ impl<I: ImageSize> Scene<I> {
         id
     }
 
-    /// Find the child by `id` from this sprite's children or grandchild
+    fn stop_all_actions_including_children(&mut self, sprite: &Sprite<I>) {
+        self.stop_all_actions(sprite.id());
+        for child in sprite.children().iter() {
+            self.stop_all_actions_including_children(child);
+        }
+    }
+
+    /// Remove the child by `id` from the scene's children or grandchild
+    /// will stop all the actions run by this child
+    pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
+        let removed = match self.children_index.pop(&id) {
+            Some(i) => {
+                let removed = self.children.remove(i).unwrap();
+                // Removing a element of vector will alter the index,
+                // update the mapping from uuid to index.
+                for index in range(i, self.children.len()) {
+                    let uuid = self.children[index].id();
+                    self.children_index.insert(uuid, index);
+                }
+                Some(removed)
+            },
+            None => {
+                for child in self.children.mut_iter() {
+                    match child.remove_child(id) {
+                        Some(c) => {
+                            return Some(c);
+                        }
+                        _ => {}
+                    }
+                }
+
+                None
+            }
+        };
+
+        if removed.is_some() {
+            self.stop_all_actions_including_children(removed.as_ref().unwrap());
+        }
+
+        removed
+    }
+
+    /// Find the child by `id` from the scene's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
         match self.children_index.find(&id) {
             Some(i) => { Some(&self.children[*i]) },
