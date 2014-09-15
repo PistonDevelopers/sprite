@@ -264,6 +264,12 @@ impl<I: ImageSize> Sprite<I> {
         }
     }
 
+    /// Get the sprite's children
+    #[inline(always)]
+    pub fn children(&self) -> &Vec<Sprite<I>> {
+        &self.children
+    }
+
     /// Draw this sprite and its children
     pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
         if !self.visible {
