@@ -66,8 +66,6 @@ pub enum Action {
     ///
     /// Tweening the action with ease function
     Ease(EaseFunction, Box<Action>),
-    /// A empty action
-    EmptyAction,
 }
 
 impl Action {
@@ -134,9 +132,6 @@ impl Action {
             Ease(f, ref action) => {
                 EaseState(f, box action.to_state(sprite))
             },
-            _ => {
-                EmptyState
-            },
         }
     }
 }
@@ -160,39 +155,11 @@ pub enum ActionState {
     FadeState(f64, f64, f64, f64),
     /// ease_function, action
     EaseState(EaseFunction, Box<ActionState>),
-    /// An empty state
-    EmptyState,
-    /// An action is paused
-    PausedState(Box<ActionState>),
 }
 
 impl ActionState {
-    /// Pause an action
-    pub fn pause(&self) -> ActionState {
-        match *self {
-            PausedState(_) => self.clone(),
-            _ => PausedState(box self.clone())
-        }
-    }
-
-    /// Resume an action
-    pub fn resume(&self) -> ActionState {
-        match *self {
-            PausedState(ref state) => (**state).clone(),
-            _ => self.clone()
-        }
-    }
-
-    /// Toggle between paused state and running state
-    pub fn toggle(&self) -> ActionState {
-        match *self {
-            PausedState(ref state) => (**state).clone(),
-            _ => PausedState(box self.clone())
-        }
-    }
-
     /// Update the state and change the sprite's properties
-    pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (ActionState, Status, f64) {
+    pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (Option<ActionState>, Status, f64) {
         match *self {
             MoveState(t, bx, by, cx, cy, d) => {
                 let factor = (t + dt) / d;
@@ -209,11 +176,11 @@ impl ActionState {
             FlipState(flip_x, flip_y) => {
                 sprite.set_flip_x(flip_x);
                 sprite.set_flip_y(flip_y);
-                (EmptyState, Success, dt)
+                (None, Success, dt)
             },
             VisibilityState(visible) => {
                 sprite.set_visible(visible);
-                (EmptyState, Success, dt)
+                (None, Success, dt)
             },
             BlinkState(past, dur, cur, total) => {
                 let period = dur / total as f64;
@@ -221,13 +188,13 @@ impl ActionState {
                     let visible = sprite.visible();
                     sprite.set_visible(!visible);
                     if past + dt >= dur {
-                        (EmptyState, Success, past + dt - dur)
+                        (None, Success, past + dt - dur)
                     } else {
-                        (BlinkState(past + dt, dur, cur + 1, total),
+                        (Some(BlinkState(past + dt, dur, cur + 1, total)),
                          Running, 0.0)
                     }
                 } else {
-                    (BlinkState(past + dt, dur, cur, total),
+                    (Some(BlinkState(past + dt, dur, cur, total)),
                      Running, 0.0)
                 }
             },
@@ -265,60 +232,59 @@ impl ActionState {
                 }
 
                 match state {
-                    EmptyState => {
-                        (EmptyState, status, remain)
+                    None => {
+                        (None, status, remain)
                     },
-                    _ => {
-                        (EaseState(f, box state),
+                    Some(state) => {
+                        (Some(EaseState(f, box state)),
                          status, remain)
                     },
                 }
             },
-            _ => { (self.clone(), Running, dt) },
         }
     }
 }
 
-fn update_position<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (ActionState, Status, f64) {
+fn update_position<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (Option<ActionState>, Status, f64) {
     if t >= d {
         sprite.set_position(bx + cx, by + cy);
-        (EmptyState, Success, t - d)
+        (None, Success, t - d)
     } else {
         sprite.set_position(bx + cx * factor, by + cy * factor);
-        (MoveState(t, bx, by, cx, cy, d),
+        (Some(MoveState(t, bx, by, cx, cy, d)),
          Running, 0.0)
     }
 }
 
-fn update_rotation<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (ActionState, Status, f64) {
+fn update_rotation<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (Option<ActionState>, Status, f64) {
     if t >= d {
         sprite.set_rotation(b + c);
-        (EmptyState, Success, t - d)
+        (None, Success, t - d)
     } else {
         sprite.set_rotation(b + c * factor);
-        (RotateState(t, b, c, d),
+        (Some(RotateState(t, b, c, d)),
          Running, 0.0)
     }
 }
 
-fn update_scale<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (ActionState, Status, f64) {
+fn update_scale<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (Option<ActionState>, Status, f64) {
     if t >= d {
         sprite.set_scale(bx + cx, by + cy);
-        (EmptyState, Success, t - d)
+        (None, Success, t - d)
     } else {
         sprite.set_scale(bx + cx * factor, by + cy * factor);
-        (ScaleState(t, bx, by, cx, cy, d),
+        (Some(ScaleState(t, bx, by, cx, cy, d)),
          Running, 0.0)
     }
 }
 
-fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (ActionState, Status, f64) {
+fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (Option<ActionState>, Status, f64) {
     if t >= d {
         sprite.set_opacity((b + c) as f32);
-        (EmptyState, Success, t - d)
+        (None, Success, t - d)
     } else {
         sprite.set_opacity((b + c * factor) as f32);
-        (FadeState(t, b, c, d),
+        (Some(FadeState(t, b, c, d)),
          Running, 0.0)
     }
 }

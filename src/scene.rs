@@ -16,14 +16,13 @@ use Sprite;
 use action::{
     Action,
     ActionState,
-    EmptyState,
 };
 
 /// A scene is used to manage sprite's life and run action with sprite
 pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, uint>,
-    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action, ActionState>, ActionState)>>,
+    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action, ActionState>, bool)>>,
 }
 
 impl<I: ImageSize> Scene<I> {
@@ -45,22 +44,30 @@ impl<I: ImageSize> Scene<I> {
         for (id, actions) in running.move_iter() {
             let mut new_actions = Vec::new();
 
-            for (b, mut a, mut s) in actions.move_iter() {
+            for (b, mut a, paused) in actions.move_iter() {
+                if paused {
+                    new_actions.push((b, a, paused));
+                    continue;
+                }
+
                 let sprite = self.child_mut(id).unwrap();
-                let (status, _) = a.update(e, |dt, action, _| {
-                    match s {
-                        EmptyState => { s = action.to_state(sprite) },
-                        _ => {},
+                let (status, _) = a.update(e, |dt, action, s| {
+                    let (state, status, remain) = {
+                        let start_state;
+                        let state = match *s {
+                            None => { start_state = action.to_state(sprite); &start_state },
+                            Some(ref state) => state,
+                        };
+                        state.update(sprite, dt)
                     };
-                    let (state, status, remain) = s.update(sprite, dt);
-                    s = state;
+                    *s = state;
                     (status, remain)
                 });
 
                 match status {
                     // the behavior is still running, add it for next update
                     Running => {
-                        new_actions.push((b, a.clone(), s));
+                        new_actions.push((b, a, paused));
                     },
                     _ => {},
                 }
@@ -83,7 +90,7 @@ impl<I: ImageSize> Scene<I> {
     pub fn run_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
         let actions = self.running.find_or_insert_with(sprite_id, |_| Vec::new());
         let state = State::new(action.clone());
-        actions.push((action.clone(), state, EmptyState));
+        actions.push((action.clone(), state, false));
     }
 
     fn find_action(&self, sprite_id: Uuid, action: &Behavior<Action>) -> Option<uint> {
@@ -110,8 +117,8 @@ impl<I: ImageSize> Scene<I> {
             println!("found");
             let i = index.unwrap();
             let actions = self.running.get_mut(&sprite_id);
-            let (b, s, action_state) = actions.remove(i).unwrap();
-            actions.push((b, s, action_state.pause()));
+            let (b, s, _) = actions.remove(i).unwrap();
+            actions.push((b, s, true));
         }
     }
 
@@ -122,8 +129,8 @@ impl<I: ImageSize> Scene<I> {
             println!("found");
             let i = index.unwrap();
             let actions = self.running.get_mut(&sprite_id);
-            let (b, s, action_state) = actions.remove(i).unwrap();
-            actions.push((b, s, action_state.resume()));
+            let (b, s, _) = actions.remove(i).unwrap();
+            actions.push((b, s, false));
         }
     }
 
@@ -133,8 +140,8 @@ impl<I: ImageSize> Scene<I> {
         if index.is_some() {
             let i = index.unwrap();
             let actions = self.running.get_mut(&sprite_id);
-            let (b, s, action_state) = actions.remove(i).unwrap();
-            actions.push((b, s, action_state.toggle()));
+            let (b, s, paused) = actions.remove(i).unwrap();
+            actions.push((b, s, !paused));
         }
     }
 
