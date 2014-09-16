@@ -23,7 +23,7 @@ use action::{
 pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, uint>,
-    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action>, ActionState)>>,
+    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action, ActionState>, ActionState)>>,
 }
 
 impl<I: ImageSize> Scene<I> {
@@ -47,7 +47,7 @@ impl<I: ImageSize> Scene<I> {
 
             for (b, mut a, mut s) in actions.move_iter() {
                 let sprite = self.child_mut(id).unwrap();
-                let (status, _) = a.update(e, |dt, action| {
+                let (status, _) = a.update(e, |dt, action, _| {
                     match s {
                         EmptyState => { s = action.to_state(sprite) },
                         _ => {},
