@@ -15,9 +15,9 @@ git = "https://github.com/rust-lang/uuid"
 
 [dependencies.event]
 
-git = "https://github.com/PistonDevelopers/rust-event"
+git = "https://github.com/pistondevelopers/event"
 
 [dependencies.graphics]
 
-git = "https://github.com/pistondevelopers/rust-graphics"
+git = "https://github.com/pistondevelopers/graphics"
 
