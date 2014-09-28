@@ -212,7 +212,7 @@ impl<I: ImageSize> Sprite<I> {
                 Some(removed)
             },
             None => {
-                for child in self.children.mut_iter() {
+                for child in self.children.iter_mut() {
                     match child.remove_child(id) {
                         Some(c) => {
                             return Some(c);
@@ -250,7 +250,7 @@ impl<I: ImageSize> Sprite<I> {
         match self.children_index.find(&id) {
             Some(i) => { Some(self.children.get_mut(*i)) },
             None => {
-                for child in self.children.mut_iter() {
+                for child in self.children.iter_mut() {
                     match child.child_mut(id) {
                         Some(c) => {
                             return Some(c);

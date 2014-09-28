@@ -41,17 +41,17 @@ impl<I: ImageSize> Scene<I> {
         let running = self.running.clone();
         self.running.clear();
 
-        for (id, actions) in running.move_iter() {
+        for (id, actions) in running.into_iter() {
             let mut new_actions = Vec::new();
 
-            for (b, mut a, paused) in actions.move_iter() {
+            for (b, mut a, paused) in actions.into_iter() {
                 if paused {
                     new_actions.push((b, a, paused));
                     continue;
                 }
 
                 let sprite = self.child_mut(id).unwrap();
-                let (status, _) = a.update(e, |dt, action, s| {
+                let (status, _) = a.event(e, |dt, action, s| {
                     let (state, status, remain) = {
                         let start_state;
                         let state = match *s {
@@ -198,7 +198,7 @@ impl<I: ImageSize> Scene<I> {
                 Some(removed)
             },
             None => {
-                for child in self.children.mut_iter() {
+                for child in self.children.iter_mut() {
                     match child.remove_child(id) {
                         Some(c) => {
                             return Some(c);
@@ -242,7 +242,7 @@ impl<I: ImageSize> Scene<I> {
         match self.children_index.find(&id) {
             Some(i) => { Some(self.children.get_mut(*i)) },
             None => {
-                for child in self.children.mut_iter() {
+                for child in self.children.iter_mut() {
                     match child.child_mut(id) {
                         Some(c) => {
                             return Some(c);
