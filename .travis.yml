@@ -1,0 +1,20 @@
+language: rust
+notifications:
+    irc: "irc.mozilla.org#piston-internals"
+os:
+    - linux
+    - osx
+env:
+    global:
+        - secure: UKUaKD2jf+AlIJKDIdZ3WxD8a52uTrKJ+QoPe92Gqm3Cbn5PzcXbgkwROHPmjEhF13Tg1jhfdT+sl5mJwO/ttKwyMKIxaOzUyeu0WCwF6dLr6wM0jsaSpQK0ORKItlR8U5lHaOp3t74cY/B4OrrJvKQitQBAnLWHOPZtDkFNzNE=
+before_script:
+    - rustc -v
+    - cargo -V
+script:
+    - cargo build -v
+    - cargo test -v
+    - cargo doc -v
+after_success:
+    - cp -R target/doc doc
+    - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
+    - rm -r doc
