@@ -87,13 +87,13 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Register action with sprite
-    pub fn run_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+    pub fn run(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
         let actions = self.running.find_or_insert_with(sprite_id, |_| Vec::new());
         let state = State::new(action.clone());
         actions.push((action.clone(), state, false));
     }
 
-    fn find_action(&self, sprite_id: Uuid, action: &Behavior<Action>) -> Option<uint> {
+    fn find(&self, sprite_id: Uuid, action: &Behavior<Action>) -> Option<uint> {
         let mut index = None;
         match self.running.find(&sprite_id) {
             Some(actions) => {
@@ -111,8 +111,8 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Pause a running action of the sprite
-    pub fn pause_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find_action(sprite_id, action);
+    pub fn pause(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find(sprite_id, action);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
@@ -123,8 +123,8 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Resume a paused action of the sprite
-    pub fn resume_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find_action(sprite_id, action);
+    pub fn resume(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find(sprite_id, action);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
@@ -135,8 +135,8 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Toggle an action of the sprite
-    pub fn toggle_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find_action(sprite_id, action);
+    pub fn toggle(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find(sprite_id, action);
         if index.is_some() {
             let i = index.unwrap();
             let actions = self.running.get_mut(&sprite_id);
@@ -146,8 +146,8 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Stop a running action of the sprite
-    pub fn stop_action(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find_action(sprite_id, action);
+    pub fn stop(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+        let index = self.find(sprite_id, action);
         if index.is_some() {
             let i = index.unwrap();
             self.running.get_mut(&sprite_id).remove(i);
@@ -155,12 +155,12 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Stop all running actions of the sprite
-    pub fn stop_all_actions(&mut self, sprite_id: Uuid) {
+    pub fn stop_all(&mut self, sprite_id: Uuid) {
         self.running.remove(&sprite_id);
     }
 
     /// Get all the running actions in the scene
-    pub fn running_actions(&self) -> uint {
+    pub fn running(&self) -> uint {
         let mut total = 0;
         for (_, actions) in self.running.iter() {
             total += actions.len();
@@ -176,10 +176,10 @@ impl<I: ImageSize> Scene<I> {
         id
     }
 
-    fn stop_all_actions_including_children(&mut self, sprite: &Sprite<I>) {
-        self.stop_all_actions(sprite.id());
+    fn stop_all_including_children(&mut self, sprite: &Sprite<I>) {
+        self.stop_all(sprite.id());
         for child in sprite.children().iter() {
-            self.stop_all_actions_including_children(child);
+            self.stop_all_including_children(child);
         }
     }
 
@@ -212,7 +212,7 @@ impl<I: ImageSize> Scene<I> {
         };
 
         if removed.is_some() {
-            self.stop_all_actions_including_children(removed.as_ref().unwrap());
+            self.stop_all_including_children(removed.as_ref().unwrap());
         }
 
         removed
