@@ -11,9 +11,9 @@ use event::{
 use EaseFunction;
 use Sprite;
 
-/// Actions supported by Sprite
+/// Animations supported by Sprite
 #[deriving(Clone, PartialEq)]
-pub enum Action {
+pub enum Animation {
     /// duration, x, y
     ///
     /// Move sprite to specified position
@@ -62,15 +62,15 @@ pub enum Action {
     ///
     /// Set the sprite's opacity to specified value in `dt` seconds
     FadeTo(f64, f64),
-    /// ease_function, action
+    /// ease_function, animation
     ///
-    /// Tweening the action with ease function
-    Ease(EaseFunction, Box<Action>),
+    /// Tweening the animation with ease function
+    Ease(EaseFunction, Box<Animation>),
 }
 
-impl Action {
-    /// Generate a new state from Action with specified Sprite
-    pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> ActionState {
+impl Animation {
+    /// Generate a new state from Animation with specified Sprite
+    pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> AnimationState {
         match *self {
             MoveTo(dur, dx, dy) => {
                 let (bx, by) = sprite.position();
@@ -129,16 +129,16 @@ impl Action {
                 let b = sprite.opacity() as f64;
                 FadeState(0.0, b, d - b, dur)
             },
-            Ease(f, ref action) => {
-                EaseState(f, box action.to_state(sprite))
+            Ease(f, ref animation) => {
+                EaseState(f, box animation.to_state(sprite))
             },
         }
     }
 }
 
-/// The state of action
+/// The state of animation
 #[deriving(Clone)]
-pub enum ActionState {
+pub enum AnimationState {
     /// time, begin_x, begin_y, change_x, change_y, duration
     MoveState(f64, Scalar, Scalar, Scalar, Scalar, f64),
     /// time, begin, change, duration
@@ -153,13 +153,17 @@ pub enum ActionState {
     BlinkState(f64, f64, uint, uint),
     /// time, begin, change, duration
     FadeState(f64, f64, f64, f64),
-    /// ease_function, action
-    EaseState(EaseFunction, Box<ActionState>),
+    /// ease_function, animation
+    EaseState(EaseFunction, Box<AnimationState>),
 }
 
-impl ActionState {
+impl AnimationState {
     /// Update the state and change the sprite's properties
-    pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (Option<ActionState>, Status, f64) {
+    pub fn update<I: ImageSize>(
+        &self,
+        sprite: &mut Sprite<I>,
+        dt: f64
+    ) -> (Option<AnimationState>, Status, f64) {
         match *self {
             MoveState(t, bx, by, cx, cy, d) => {
                 let factor = (t + dt) / d;
@@ -207,7 +211,8 @@ impl ActionState {
                 let (state, status, remain) = match *state {
                     box MoveState(t, bx, by, cx, cy, d) => {
                         let factor = f.calc((t + dt) / d);
-                        update_position(sprite, factor, t + dt, bx, by, cx, cy, d)
+                        update_position(sprite, factor, t + dt,
+                                        bx, by, cx, cy, d)
                     },
                     box RotateState(t, b, c, d) => {
                         let factor = f.calc((t + dt) / d);
@@ -245,7 +250,16 @@ impl ActionState {
     }
 }
 
-fn update_position<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (Option<ActionState>, Status, f64) {
+fn update_position<I: ImageSize>(
+    sprite: &mut Sprite<I>,
+    factor: f64,
+    t: f64,
+    bx: f64,
+    by: f64,
+    cx: f64,
+    cy: f64,
+    d: f64
+) -> (Option<AnimationState>, Status, f64) {
     if t >= d {
         sprite.set_position(bx + cx, by + cy);
         (None, Success, t - d)
@@ -256,7 +270,14 @@ fn update_position<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx
     }
 }
 
-fn update_rotation<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (Option<ActionState>, Status, f64) {
+fn update_rotation<I: ImageSize>(
+    sprite: &mut Sprite<I>,
+    factor: f64,
+    t: f64,
+    b: f64,
+    c: f64,
+    d: f64
+) -> (Option<AnimationState>, Status, f64) {
     if t >= d {
         sprite.set_rotation(b + c);
         (None, Success, t - d)
@@ -267,7 +288,16 @@ fn update_rotation<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b:
     }
 }
 
-fn update_scale<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (Option<ActionState>, Status, f64) {
+fn update_scale<I: ImageSize>(
+    sprite: &mut Sprite<I>,
+    factor: f64,
+    t: f64,
+    bx: f64,
+    by: f64,
+    cx: f64,
+    cy: f64,
+    d: f64
+) -> (Option<AnimationState>, Status, f64) {
     if t >= d {
         sprite.set_scale(bx + cx, by + cy);
         (None, Success, t - d)
@@ -278,7 +308,14 @@ fn update_scale<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f
     }
 }
 
-fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (Option<ActionState>, Status, f64) {
+fn update_opacity<I: ImageSize>(
+    sprite: &mut Sprite<I>,
+    factor: f64,
+    t: f64,
+    b: f64,
+    c: f64,
+    d: f64
+) -> (Option<AnimationState>, Status, f64) {
     if t >= d {
         sprite.set_opacity((b + c) as f32);
         (None, Success, t - d)
@@ -288,4 +325,3 @@ fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: 
          Running, 0.0)
     }
 }
-
