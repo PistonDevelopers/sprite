@@ -88,7 +88,11 @@ impl<I: ImageSize> Scene<I> {
 
     /// Register action with sprite
     pub fn run(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let actions = self.running.find_or_insert_with(sprite_id, |_| Vec::new());
+        use std::collections::hashmap::{ Vacant, Occupied };
+        let actions = match self.running.entry(sprite_id) {
+            Vacant(entry) => entry.set(Vec::new()),
+            Occupied(entry) => entry.into_mut()
+        };
         let state = State::new(action.clone());
         actions.push((action.clone(), state, false));
     }
