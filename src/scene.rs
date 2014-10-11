@@ -37,7 +37,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Update animation's state
-    pub fn update(&mut self, e: &Event) {
+    pub fn event(&mut self, e: &Event) {
         // regenerate the animations and their states
         let running = self.running.clone();
         self.running.clear();
