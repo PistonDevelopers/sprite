@@ -13,16 +13,17 @@ use event::{
 
 use Sprite;
 
-use action::{
-    Action,
-    ActionState,
+use animation::{
+    Animation,
+    AnimationState,
 };
 
-/// A scene is used to manage sprite's life and run action with sprite
+/// A scene is used to manage sprite's life and run animation with sprite
 pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, uint>,
-    running: HashMap<Uuid, Vec<(Behavior<Action>, State<Action, ActionState>, bool)>>,
+    running: HashMap<Uuid,
+        Vec<(Behavior<Animation>, State<Animation, AnimationState>, bool)>>,
 }
 
 impl<I: ImageSize> Scene<I> {
@@ -35,27 +36,27 @@ impl<I: ImageSize> Scene<I> {
         }
     }
 
-    /// Update action's state
+    /// Update animation's state
     pub fn update(&mut self, e: &Event) {
-        // regenerate the actions and their states
+        // regenerate the animations and their states
         let running = self.running.clone();
         self.running.clear();
 
-        for (id, actions) in running.into_iter() {
-            let mut new_actions = Vec::new();
+        for (id, animations) in running.into_iter() {
+            let mut new_animations = Vec::new();
 
-            for (b, mut a, paused) in actions.into_iter() {
+            for (b, mut a, paused) in animations.into_iter() {
                 if paused {
-                    new_actions.push((b, a, paused));
+                    new_animations.push((b, a, paused));
                     continue;
                 }
 
                 let sprite = self.child_mut(id).unwrap();
-                let (status, _) = a.event(e, |_, dt, action, s| {
+                let (status, _) = a.event(e, |_, dt, animation, s| {
                     let (state, status, remain) = {
                         let start_state;
                         let state = match *s {
-                            None => { start_state = action.to_state(sprite); &start_state },
+                            None => { start_state = animation.to_state(sprite); &start_state },
                             Some(ref state) => state,
                         };
                         state.update(sprite, dt)
@@ -67,14 +68,14 @@ impl<I: ImageSize> Scene<I> {
                 match status {
                     // the behavior is still running, add it for next update
                     Running => {
-                        new_actions.push((b, a, paused));
+                        new_animations.push((b, a, paused));
                     },
                     _ => {},
                 }
             }
 
-            if new_actions.len() > 0 {
-                self.running.insert(id, new_actions);
+            if new_animations.len() > 0 {
+                self.running.insert(id, new_animations);
             }
         }
     }
@@ -86,24 +87,24 @@ impl<I: ImageSize> Scene<I> {
         }
     }
 
-    /// Register action with sprite
-    pub fn run(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
+    /// Register animation with sprite
+    pub fn run(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         use std::collections::hashmap::{ Vacant, Occupied };
-        let actions = match self.running.entry(sprite_id) {
+        let animations = match self.running.entry(sprite_id) {
             Vacant(entry) => entry.set(Vec::new()),
             Occupied(entry) => entry.into_mut()
         };
-        let state = State::new(action.clone());
-        actions.push((action.clone(), state, false));
+        let state = State::new(animation.clone());
+        animations.push((animation.clone(), state, false));
     }
 
-    fn find(&self, sprite_id: Uuid, action: &Behavior<Action>) -> Option<uint> {
+    fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<uint> {
         let mut index = None;
         match self.running.find(&sprite_id) {
-            Some(actions) => {
-                for i in range(0, actions.len()) {
-                    let (ref b, _, _) = actions[i];
-                    if b == action {
+            Some(animations) => {
+                for i in range(0, animations.len()) {
+                    let (ref b, _, _) = animations[i];
+                    if b == animation {
                         index = Some(i);
                         break;
                     }
@@ -114,60 +115,60 @@ impl<I: ImageSize> Scene<I> {
         index
     }
 
-    /// Pause a running action of the sprite
-    pub fn pause(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find(sprite_id, action);
+    /// Pause a running animation of the sprite
+    pub fn pause(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
+        let index = self.find(sprite_id, animation);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
-            let actions = self.running.get_mut(&sprite_id);
-            let (b, s, _) = actions.remove(i).unwrap();
-            actions.push((b, s, true));
+            let animations = self.running.get_mut(&sprite_id);
+            let (b, s, _) = animations.remove(i).unwrap();
+            animations.push((b, s, true));
         }
     }
 
-    /// Resume a paused action of the sprite
-    pub fn resume(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find(sprite_id, action);
+    /// Resume a paused animation of the sprite
+    pub fn resume(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
+        let index = self.find(sprite_id, animation);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
-            let actions = self.running.get_mut(&sprite_id);
-            let (b, s, _) = actions.remove(i).unwrap();
-            actions.push((b, s, false));
+            let animations = self.running.get_mut(&sprite_id);
+            let (b, s, _) = animations.remove(i).unwrap();
+            animations.push((b, s, false));
         }
     }
 
-    /// Toggle an action of the sprite
-    pub fn toggle(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find(sprite_id, action);
+    /// Toggle an animation of the sprite
+    pub fn toggle(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
+        let index = self.find(sprite_id, animation);
         if index.is_some() {
             let i = index.unwrap();
-            let actions = self.running.get_mut(&sprite_id);
-            let (b, s, paused) = actions.remove(i).unwrap();
-            actions.push((b, s, !paused));
+            let animations = self.running.get_mut(&sprite_id);
+            let (b, s, paused) = animations.remove(i).unwrap();
+            animations.push((b, s, !paused));
         }
     }
 
-    /// Stop a running action of the sprite
-    pub fn stop(&mut self, sprite_id: Uuid, action: &Behavior<Action>) {
-        let index = self.find(sprite_id, action);
+    /// Stop a running animation of the sprite
+    pub fn stop(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
+        let index = self.find(sprite_id, animation);
         if index.is_some() {
             let i = index.unwrap();
             self.running.get_mut(&sprite_id).remove(i);
         }
     }
 
-    /// Stop all running actions of the sprite
+    /// Stop all running animations of the sprite
     pub fn stop_all(&mut self, sprite_id: Uuid) {
         self.running.remove(&sprite_id);
     }
 
-    /// Get all the running actions in the scene
+    /// Get all the running animations in the scene
     pub fn running(&self) -> uint {
         let mut total = 0;
-        for (_, actions) in self.running.iter() {
-            total += actions.len();
+        for (_, animations) in self.running.iter() {
+            total += animations.len();
         }
         total
     }
@@ -188,7 +189,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Remove the child by `id` from the scene's children or grandchild
-    /// will stop all the actions run by this child
+    /// will stop all the animations run by this child
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
         let removed = match self.children_index.pop(&id) {
             Some(i) => {
@@ -260,4 +261,3 @@ impl<I: ImageSize> Scene<I> {
         }
     }
 }
-

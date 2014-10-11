@@ -10,9 +10,9 @@ extern crate uuid;
 extern crate event;
 extern crate graphics;
 
-pub use action::{
-    Action,
-    ActionState,
+pub use animation::{
+    Animation,
+    AnimationState,
 
     MoveTo,
     MoveBy,
@@ -80,8 +80,7 @@ pub use ease::{
     EaseBounceInOut,
 };
 
-mod action;
+mod animation;
 mod ease;
 mod scene;
 mod sprite;
-
