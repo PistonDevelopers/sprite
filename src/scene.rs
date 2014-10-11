@@ -5,7 +5,7 @@ use uuid::Uuid;
 use graphics::*;
 
 use event::{
-    Event,
+    GenericEvent,
     Behavior,
     State,
     Running,
@@ -37,7 +37,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Update animation's state
-    pub fn event(&mut self, e: &Event) {
+    pub fn event<E: GenericEvent>(&mut self, e: &E) {
         // regenerate the animations and their states
         let running = self.running.clone();
         self.running.clear();
