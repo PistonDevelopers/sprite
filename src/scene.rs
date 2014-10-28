@@ -4,8 +4,8 @@ use uuid::Uuid;
 
 use graphics::*;
 
-use event::{
-    GenericEvent,
+use event::GenericEvent;
+use ai_behavior::{
     Behavior,
     State,
     Running,
