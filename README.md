@@ -8,3 +8,8 @@ Here is an [example](https://github.com/PistonDevelopers/piston-examples/tree/ma
 ![actions](./demo.gif)
 
 (The gif has low FPS, you can try the example yourself to see the full effect)
+
+## Dependencies
+
+![dependencies](./Cargo.png)
+
