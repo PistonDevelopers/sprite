@@ -1,0 +1,16 @@
+digraph example3 {
+    N0[label="sprite"];
+    N1[label="uuid"];
+    N2[label="ai_behavior"];
+    N3[label="event"];
+    N4[label="graphics"];
+    N5[label="vecmath"];
+    N6[label="input"];
+    N2 -> N3[label=""];
+    N4 -> N5[label=""];
+    N0 -> N3[label=""];
+    N0 -> N4[label=""];
+    N0 -> N2[label=""];
+    N0 -> N1[label=""];
+    N3 -> N6[label=""];
+}
