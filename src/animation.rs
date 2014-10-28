@@ -2,7 +2,7 @@
 use graphics::ImageSize;
 use graphics::vecmath::Scalar;
 
-use event::{
+use ai_behavior::{
     Status,
     Success,
     Running,

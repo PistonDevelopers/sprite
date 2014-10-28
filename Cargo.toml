@@ -13,6 +13,10 @@ path = "./src/lib.rs"
 
 git = "https://github.com/rust-lang/uuid"
 
+[dependencies.ai_behavior]
+
+git = "https://github.com/pistondevelopers/ai_behavior"
+
 [dependencies.event]
 
 git = "https://github.com/pistondevelopers/event"
