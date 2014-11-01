@@ -4,7 +4,7 @@ use std::f64::consts::{
     PI_2,
 };
 
-#[allow(missing_doc)]
+#[allow(missing_docs)]
 #[deriving(Clone, PartialEq)]
 pub enum EaseFunction {
     EaseQuadraticIn,
