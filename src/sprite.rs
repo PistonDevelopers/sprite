@@ -248,7 +248,7 @@ impl<I: ImageSize> Sprite<I> {
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
         match self.children_index.find(&id) {
-            Some(i) => { Some(self.children.get_mut(*i)) },
+            Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {
                     match child.child_mut(id) {

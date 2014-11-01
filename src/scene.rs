@@ -121,7 +121,7 @@ impl<I: ImageSize> Scene<I> {
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
-            let animations = self.running.get_mut(&sprite_id);
+            let animations = &mut self.running[sprite_id];
             let (b, s, _) = animations.remove(i).unwrap();
             animations.push((b, s, true));
         }
@@ -133,7 +133,7 @@ impl<I: ImageSize> Scene<I> {
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
-            let animations = self.running.get_mut(&sprite_id);
+            let animations = &mut self.running[sprite_id];
             let (b, s, _) = animations.remove(i).unwrap();
             animations.push((b, s, false));
         }
@@ -144,7 +144,7 @@ impl<I: ImageSize> Scene<I> {
         let index = self.find(sprite_id, animation);
         if index.is_some() {
             let i = index.unwrap();
-            let animations = self.running.get_mut(&sprite_id);
+            let animations = &mut self.running[sprite_id];
             let (b, s, paused) = animations.remove(i).unwrap();
             animations.push((b, s, !paused));
         }
@@ -155,7 +155,7 @@ impl<I: ImageSize> Scene<I> {
         let index = self.find(sprite_id, animation);
         if index.is_some() {
             let i = index.unwrap();
-            self.running.get_mut(&sprite_id).remove(i);
+            &mut self.running[sprite_id].remove(i);
         }
     }
 
@@ -245,7 +245,7 @@ impl<I: ImageSize> Scene<I> {
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
         match self.children_index.find(&id) {
-            Some(i) => { Some(self.children.get_mut(*i)) },
+            Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {
                     match child.child_mut(id) {
