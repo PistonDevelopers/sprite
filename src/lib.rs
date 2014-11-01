@@ -1,6 +1,6 @@
 
 #![crate_name = "sprite"]
-#![deny(missing_doc)]
+#![deny(missing_docs)]
 #![warn(dead_code)]
 #![feature(globs)]
 
