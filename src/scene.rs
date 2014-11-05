@@ -1,5 +1,5 @@
 
-use std::collections::hashmap::HashMap;
+use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::*;
@@ -89,7 +89,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Register animation with sprite
     pub fn run(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        use std::collections::hashmap::{ Vacant, Occupied };
+        use std::collections::hash_map::{ Vacant, Occupied };
         let animations = match self.running.entry(sprite_id) {
             Vacant(entry) => entry.set(Vec::new()),
             Occupied(entry) => entry.into_mut()
