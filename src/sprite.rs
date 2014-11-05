@@ -1,6 +1,6 @@
 
 use std::rc::Rc;
-use std::collections::hashmap::HashMap;
+use std::collections::HashMap;
 
 use uuid::Uuid;
 
