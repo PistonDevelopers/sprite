@@ -1,4 +1,6 @@
 
+//! A module contains implementation of ease functions.
+
 use std::f64::consts::{
     PI,
     PI_2,
@@ -96,16 +98,22 @@ impl EaseFunction {
 }
 
 
+/// Applies EaseQuadraticIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quadratic_in(mut p: f64) -> f64 {
     p = normalized(p);
     p * p
 }
 
+/// Applies EaseQuadraticOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quadratic_out(mut p: f64) -> f64 {
     p = normalized(p);
     -(p * (p - 2.0))
 }
 
+/// Applies EaseQuadraticInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quadratic_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -116,17 +124,23 @@ pub fn quadratic_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseCubicIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn cubic_in(mut p: f64) -> f64 {
     p = normalized(p);
     p * p * p
 }
 
+/// Applies EaseCubicOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn cubic_out(mut p: f64) -> f64 {
     p = normalized(p);
     let f = p - 1.0;
     f * f * f + 1.0
 }
 
+/// Applies EaseCubicInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn cubic_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -138,17 +152,23 @@ pub fn cubic_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseQuarticIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quartic_in(mut p: f64) -> f64 {
     p = normalized(p);
     p * p * p * p
 }
 
+/// Applies EaseQuarticOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quartic_out(mut p: f64) -> f64 {
     p = normalized(p);
     let f = p - 1.0;
     f * f * f * (1.0 - p) + 1.0
 }
 
+/// Applies EaseQuarticInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quartic_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -160,17 +180,23 @@ pub fn quartic_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseQuinticIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quintic_in(mut p: f64) -> f64 {
     p = normalized(p);
     p * p * p * p * p
 }
 
+/// Applies EaseQuinticOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quintic_out(mut p: f64) -> f64 {
     p = normalized(p);
     let f = p - 1.0;
     f * f * f * f * f + 1.0
 }
 
+/// Applies EaseQuinticInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn quintic_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5  {
@@ -182,32 +208,44 @@ pub fn quintic_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseSineIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn sine_in(mut p: f64) -> f64 {
     p = normalized(p);
     ((p - 1.0) * PI_2).sin() + 1.0
 }
 
+/// Applies EaseSineOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn sine_out(mut p: f64) -> f64 {
     p = normalized(p);
     (p * PI_2).sin()
 }
 
+/// Applies EaseSineInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn sine_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     0.5 * (1.0 - (p * PI).cos())
 }
 
 
+/// Applies EaseCircularIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn circular_in(mut p: f64) -> f64 {
     p = normalized(p);
     1.0 - (1.0 - (p * p)).sqrt()
 }
 
+/// Applies EaseCircularOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn circular_out(mut p: f64) -> f64 {
     p = normalized(p);
     ((2.0 - p) * p).sqrt()
 }
 
+/// Applies EaseCircularInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn circular_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -218,6 +256,8 @@ pub fn circular_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseExponentialIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn exponential_in(mut p: f64) -> f64 {
     p = normalized(p);
     if p == 0.0 {
@@ -227,6 +267,8 @@ pub fn exponential_in(mut p: f64) -> f64 {
     }
 }
 
+/// Applies EaseExponentialOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn exponential_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p == 1.0 {
@@ -236,6 +278,8 @@ pub fn exponential_out(mut p: f64) -> f64 {
     }
 }
 
+/// Applies EaseExponentialInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn exponential_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p == 0.0 || p == 1.0 {
@@ -250,16 +294,22 @@ pub fn exponential_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseElasticIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn elastic_in(mut p: f64) -> f64 {
     p = normalized(p);
     (13.0 * PI_2 * p).sin() * 2.0f64.powf(10.0 * (p - 1.0))
 }
 
+/// Applies EaseElasticOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn elastic_out(mut p: f64) -> f64 {
     p = normalized(p);
     (-13.0 * PI_2 * (p + 1.0)).sin() * 2.0f64.powf(-10.0 * p) + 1.0
 }
 
+/// Applies EaseElasticInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn elastic_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -270,17 +320,23 @@ pub fn elastic_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseBackIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn back_in(mut p: f64) -> f64 {
     p = normalized(p);
     p * p * p - p * (p * PI).sin()
 }
 
+/// Applies EaseBackOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn back_out(mut p: f64) -> f64 {
     p = normalized(p);
     let f = 1.0 - p;
     1.0 - (f * f * f - f * (f * PI).sin())
 }
 
+/// Applies EaseBackInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn back_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {
@@ -293,11 +349,15 @@ pub fn back_in_out(mut p: f64) -> f64 {
 }
 
 
+/// Applies EaseBounceIn function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn bounce_in(mut p: f64) -> f64 {
     p = normalized(p);
     1.0 - bounce_out(1.0 - p)
 }
 
+/// Applies EaseBounceOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn bounce_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 4.0 / 11.0 {
@@ -311,6 +371,8 @@ pub fn bounce_out(mut p: f64) -> f64 {
     }
 }
 
+/// Applies EaseBounceInOut function to the input value.
+/// Value below 0.0 is interpreted as 0.0, and value above 1.0 is interpreted as 1.0.
 pub fn bounce_in_out(mut p: f64) -> f64 {
     p = normalized(p);
     if p < 0.5 {

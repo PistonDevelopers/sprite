@@ -81,7 +81,8 @@ pub use ease::{
     EaseBounceInOut,
 };
 
+pub mod ease;
+
 mod animation;
-mod ease;
 mod scene;
 mod sprite;
