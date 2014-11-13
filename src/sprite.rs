@@ -200,7 +200,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Remove the child by `id` from this sprite's children or grandchild
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
-        match self.children_index.pop(&id) {
+        match self.children_index.remove(&id) {
             Some(i) => {
                 let removed = self.children.remove(i).unwrap();
                 // Removing a element of vector will alter the index,
@@ -228,7 +228,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Find the child by `id` from this sprite's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
-        match self.children_index.find(&id) {
+        match self.children_index.get(&id) {
             Some(i) => { Some(&self.children[*i]) },
             None => {
                 for child in self.children.iter() {
@@ -247,7 +247,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
-        match self.children_index.find(&id) {
+        match self.children_index.get(&id) {
             Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {

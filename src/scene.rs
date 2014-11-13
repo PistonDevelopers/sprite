@@ -100,7 +100,7 @@ impl<I: ImageSize> Scene<I> {
 
     fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<uint> {
         let mut index = None;
-        match self.running.find(&sprite_id) {
+        match self.running.get(&sprite_id) {
             Some(animations) => {
                 for i in range(0, animations.len()) {
                     let (ref b, _, _) = animations[i];
@@ -191,7 +191,7 @@ impl<I: ImageSize> Scene<I> {
     /// Remove the child by `id` from the scene's children or grandchild
     /// will stop all the animations run by this child
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
-        let removed = match self.children_index.pop(&id) {
+        let removed = match self.children_index.remove(&id) {
             Some(i) => {
                 let removed = self.children.remove(i).unwrap();
                 // Removing a element of vector will alter the index,
@@ -225,7 +225,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Find the child by `id` from the scene's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
-        match self.children_index.find(&id) {
+        match self.children_index.get(&id) {
             Some(i) => { Some(&self.children[*i]) },
             None => {
                 for child in self.children.iter() {
@@ -244,7 +244,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
-        match self.children_index.find(&id) {
+        match self.children_index.get(&id) {
             Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {
