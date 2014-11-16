@@ -5,6 +5,10 @@ use std::f64::consts::{
     PI,
     PI_2,
 };
+use std::num::{
+    Float,
+    FloatMath,
+};
 
 #[allow(missing_docs)]
 #[deriving(Clone, PartialEq)]
