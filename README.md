@@ -2,6 +2,8 @@
 
 A library for sprite hierarchy and scene management
 
+[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+
 ## Example
 Here is an [example](https://github.com/PistonDevelopers/piston-examples/tree/master/sprite) what `sprite` can do.
 
