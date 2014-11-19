@@ -11,7 +11,7 @@ use ai_behavior::{
     Running,
 };
 
-use Sprite;
+use sprite::Sprite;
 
 use animation::{
     Animation,

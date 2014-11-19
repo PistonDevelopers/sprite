@@ -10,6 +10,48 @@ use std::num::{
     FloatMath,
 };
 
+pub use ease::EaseFunction::{
+    EaseQuadraticIn,
+    EaseQuadraticOut,
+    EaseQuadraticInOut,
+
+    EaseCubicIn,
+    EaseCubicOut,
+    EaseCubicInOut,
+
+    EaseQuarticIn,
+    EaseQuarticOut,
+    EaseQuarticInOut,
+
+    EaseQuinticIn,
+    EaseQuinticOut,
+    EaseQuinticInOut,
+
+    EaseSineIn,
+    EaseSineOut,
+    EaseSineInOut,
+
+    EaseCircularIn,
+    EaseCircularOut,
+    EaseCircularInOut,
+
+    EaseExponentialIn,
+    EaseExponentialOut,
+    EaseExponentialInOut,
+
+    EaseElasticIn,
+    EaseElasticOut,
+    EaseElasticInOut,
+
+    EaseBackIn,
+    EaseBackOut,
+    EaseBackInOut,
+
+    EaseBounceIn,
+    EaseBounceOut,
+    EaseBounceInOut,
+};
+
 #[allow(missing_docs)]
 #[deriving(Clone, PartialEq)]
 pub enum EaseFunction {

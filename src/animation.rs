@@ -8,8 +8,38 @@ use ai_behavior::{
     Running,
 };
 
-use EaseFunction;
-use Sprite;
+use ease::EaseFunction;
+use sprite::Sprite;
+
+pub use animation::Animation::{
+    MoveTo,
+    MoveBy,
+    RotateTo,
+    RotateBy,
+    ScaleTo,
+    ScaleBy,
+    FlipX,
+    FlipY,
+    Show,
+    Hide,
+    ToggleVisibility,
+    Blink,
+    FadeIn,
+    FadeOut,
+    FadeTo,
+    Ease,
+};
+
+pub use animation::AnimationState::{
+    MoveState,
+    RotateState,
+    ScaleState,
+    FlipState,
+    VisibilityState,
+    BlinkState,
+    FadeState,
+    EaseState,
+};
 
 /// Animations supported by Sprite
 #[deriving(Clone, PartialEq)]
