@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use uuid::Uuid;
 
-use graphics::*;
+use graphics::{ Context, BackEnd, ImageSize };
 use graphics::internal::{
     Rectangle,
     Vec2d,
@@ -272,6 +272,8 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Draw this sprite and its children
     pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
+        use graphics::*;
+
         if !self.visible {
             return;
         }
