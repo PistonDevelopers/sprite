@@ -25,3 +25,7 @@ git = "https://github.com/pistondevelopers/event"
 
 git = "https://github.com/pistondevelopers/graphics"
 
+[dependencies.current]
+
+git = "https://github.com/pistondevelopers/current"
+
