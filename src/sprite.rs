@@ -1,9 +1,10 @@
-
+use current::{ Set };
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use uuid::Uuid;
 
+use graphics;
 use graphics::{ Context, BackEnd, ImageSize };
 use graphics::internal::{
     Rectangle,
@@ -287,10 +288,7 @@ impl<I: ImageSize> Sprite<I> {
                            .rot_deg(self.rotation)
                            .scale(self.scale[0], self.scale[1]);
 
-        let mut model = transformed.rect(-anchor[0],
-                                         -anchor[1],
-                                          w,
-                                          h);
+        let mut model = transformed.clone();
 
         if self.flip_x {
             model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
@@ -303,7 +301,10 @@ impl<I: ImageSize> Sprite<I> {
         // for debug: bounding_box
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
-        model.rgba(1.0, 1.0, 1.0, self.opacity).image(&*self.texture).draw(b);
+        graphics::Image::new()
+            .set(Color([1.0, 1.0, 1.0, self.opacity]))
+            .set(Rect([-anchor[0], -anchor[1], w, h]))
+            .draw(&*self.texture, &model, b);
 
         // for debug: anchor point
         //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
