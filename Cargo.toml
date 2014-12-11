@@ -15,23 +15,11 @@ homepage = "https://github.com/pistondevelopers/sprite"
 name = "sprite"
 path = "./src/lib.rs"
 
-[dependencies.pistoncore-event]
+[dependencies]
 
-git = "https://github.com/pistondevelopers/event"
-
-[dependencies.pistoncore-current]
-
-git = "https://github.com/pistondevelopers/current"
-
-[dependencies.piston2d-graphics]
-
-git = "https://github.com/pistondevelopers/graphics"
-
-[dependencies.piston-ai_behavior]
-
-git = "https://github.com/pistondevelopers/ai_behavior"
-
-[dependencies.uuid]
-
-git = "https://github.com/rust-lang/uuid"
+pistoncore-event = "0.0.0"
+pistoncore-current = "0.0.0"
+piston2d-graphics = "0.0.0"
+piston-ai_behavior = "0.0.0"
+uuid = "0.1.0"
 
