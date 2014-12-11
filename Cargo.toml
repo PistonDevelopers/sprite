@@ -1,31 +1,37 @@
 [package]
 
-name = "sprite"
+name = "piston2d-sprite"
 version = "0.0.0"
 authors = ["Coeuvre Wong <coeuvre@gmail.com>"]
+tags = ["sprite", "animation", "2d"]
+description = "A library for sprite hierarchy and scene management"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/sprite.git"
+homepage = "https://github.com/pistondevelopers/sprite"
 
 [lib]
 
 name = "sprite"
 path = "./src/lib.rs"
 
-[dependencies.uuid]
-
-git = "https://github.com/rust-lang/uuid"
-
-[dependencies.ai_behavior]
-
-git = "https://github.com/pistondevelopers/ai_behavior"
-
-[dependencies.event]
+[dependencies.pistoncore-event]
 
 git = "https://github.com/pistondevelopers/event"
 
-[dependencies.graphics]
+[dependencies.pistoncore-current]
+
+git = "https://github.com/pistondevelopers/current"
+
+[dependencies.piston2d-graphics]
 
 git = "https://github.com/pistondevelopers/graphics"
 
-[dependencies.current]
+[dependencies.piston-ai_behavior]
 
-git = "https://github.com/pistondevelopers/current"
+git = "https://github.com/pistondevelopers/ai_behavior"
+
+[dependencies.uuid]
+
+git = "https://github.com/rust-lang/uuid"
 
