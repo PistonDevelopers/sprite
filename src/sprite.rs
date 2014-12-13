@@ -64,7 +64,7 @@ impl<I: ImageSize> Sprite<I> {
     /// Get the sprite's id
     #[inline(always)]
     pub fn id(&self) -> Uuid {
-        self.id
+        self.id.clone()
     }
 
     /// Whether or not the sprite is visible
@@ -195,7 +195,7 @@ impl<I: ImageSize> Sprite<I> {
     pub fn add_child(&mut self, sprite: Sprite<I>) -> Uuid {
         let id = sprite.id();
         self.children.push(sprite);
-        self.children_index.insert(id, self.children.len() - 1);
+        self.children_index.insert(id.clone(), self.children.len() - 1);
         id
     }
 
@@ -214,7 +214,7 @@ impl<I: ImageSize> Sprite<I> {
             },
             None => {
                 for child in self.children.iter_mut() {
-                    match child.remove_child(id) {
+                    match child.remove_child(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }
@@ -233,7 +233,7 @@ impl<I: ImageSize> Sprite<I> {
             Some(i) => { Some(&self.children[*i]) },
             None => {
                 for child in self.children.iter() {
-                    match child.child(id) {
+                    match child.child(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }
@@ -252,7 +252,7 @@ impl<I: ImageSize> Sprite<I> {
             Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {
-                    match child.child_mut(id) {
+                    match child.child_mut(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }

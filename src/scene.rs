@@ -51,7 +51,7 @@ impl<I: ImageSize> Scene<I> {
                     continue;
                 }
 
-                let sprite = self.child_mut(id).unwrap();
+                let sprite = self.child_mut(id.clone()).unwrap();
                 let (status, _) = a.event(e, |_, dt, animation, s| {
                     let (state, status, remain) = {
                         let start_state;
@@ -117,7 +117,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Pause a running animation of the sprite
     pub fn pause(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id, animation);
+        let index = self.find(sprite_id.clone(), animation);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
@@ -129,7 +129,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Resume a paused animation of the sprite
     pub fn resume(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id, animation);
+        let index = self.find(sprite_id.clone(), animation);
         if index.is_some() {
             println!("found");
             let i = index.unwrap();
@@ -141,7 +141,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Toggle an animation of the sprite
     pub fn toggle(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id, animation);
+        let index = self.find(sprite_id.clone(), animation);
         if index.is_some() {
             let i = index.unwrap();
             let animations = &mut self.running[sprite_id];
@@ -152,7 +152,7 @@ impl<I: ImageSize> Scene<I> {
 
     /// Stop a running animation of the sprite
     pub fn stop(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id, animation);
+        let index = self.find(sprite_id.clone(), animation);
         if index.is_some() {
             let i = index.unwrap();
             &mut self.running[sprite_id].remove(i);
@@ -177,7 +177,7 @@ impl<I: ImageSize> Scene<I> {
     pub fn add_child(&mut self, sprite: Sprite<I>) -> Uuid {
         let id = sprite.id();
         self.children.push(sprite);
-        self.children_index.insert(id, self.children.len() - 1);
+        self.children_index.insert(id.clone(), self.children.len() - 1);
         id
     }
 
@@ -204,7 +204,7 @@ impl<I: ImageSize> Scene<I> {
             },
             None => {
                 for child in self.children.iter_mut() {
-                    match child.remove_child(id) {
+                    match child.remove_child(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }
@@ -229,7 +229,7 @@ impl<I: ImageSize> Scene<I> {
             Some(i) => { Some(&self.children[*i]) },
             None => {
                 for child in self.children.iter() {
-                    match child.child(id) {
+                    match child.child(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }
@@ -248,7 +248,7 @@ impl<I: ImageSize> Scene<I> {
             Some(i) => { Some(&mut self.children[*i]) },
             None => {
                 for child in self.children.iter_mut() {
-                    match child.child_mut(id) {
+                    match child.child_mut(id.clone()) {
                         Some(c) => {
                             return Some(c);
                         }

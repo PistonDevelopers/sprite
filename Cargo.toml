@@ -1,9 +1,9 @@
 [package]
 
 name = "piston2d-sprite"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Coeuvre Wong <coeuvre@gmail.com>"]
-tags = ["sprite", "animation", "2d"]
+keywords = ["sprite", "animation", "2d"]
 description = "A library for sprite hierarchy and scene management"
 license = "MIT"
 readme = "README.md"
