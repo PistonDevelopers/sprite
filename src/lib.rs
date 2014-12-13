@@ -1,6 +1,7 @@
 
 #![crate_name = "sprite"]
 #![deny(missing_docs)]
+#![deny(missing_copy_implementations)]
 #![warn(dead_code)]
 #![feature(globs)]
 

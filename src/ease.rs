@@ -53,7 +53,7 @@ pub use ease::EaseFunction::{
 };
 
 #[allow(missing_docs)]
-#[deriving(Clone, PartialEq)]
+#[deriving(Copy, Clone, PartialEq)]
 pub enum EaseFunction {
     EaseQuadraticIn,
     EaseQuadraticOut,
