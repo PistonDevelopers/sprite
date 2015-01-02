@@ -40,49 +40,7 @@ pub use animation::{
 };
 pub use scene::Scene;
 pub use sprite::Sprite;
-pub use interpolation::ease::{
-    EaseFunction,
-
-    EaseQuadraticIn,
-    EaseQuadraticOut,
-    EaseQuadraticInOut,
-
-    EaseCubicIn,
-    EaseCubicOut,
-    EaseCubicInOut,
-
-    EaseQuarticIn,
-    EaseQuarticOut,
-    EaseQuarticInOut,
-
-    EaseQuinticIn,
-    EaseQuinticOut,
-    EaseQuinticInOut,
-
-    EaseSineIn,
-    EaseSineOut,
-    EaseSineInOut,
-
-    EaseCircularIn,
-    EaseCircularOut,
-    EaseCircularInOut,
-
-    EaseExponentialIn,
-    EaseExponentialOut,
-    EaseExponentialInOut,
-
-    EaseElasticIn,
-    EaseElasticOut,
-    EaseElasticInOut,
-
-    EaseBackIn,
-    EaseBackOut,
-    EaseBackInOut,
-
-    EaseBounceIn,
-    EaseBounceOut,
-    EaseBounceInOut,
-};
+pub use interpolation::ease::EaseFunction;
 
 mod animation;
 mod scene;
