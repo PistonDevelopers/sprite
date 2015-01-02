@@ -8,7 +8,7 @@ use ai_behavior::{
     Running,
 };
 
-use ease::EaseFunction;
+use interpolation::ease::EaseFunction;
 use sprite::Sprite;
 
 pub use animation::Animation::{

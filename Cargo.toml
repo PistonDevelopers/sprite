@@ -2,7 +2,11 @@
 
 name = "piston2d-sprite"
 version = "0.0.1"
-authors = ["Coeuvre Wong <coeuvre@gmail.com>"]
+authors = [
+    "Coeuvre Wong <coeuvre@gmail.com>",
+    "zummenix",
+    "bvssvni <bvssvni@gmail.com>"
+]
 keywords = ["sprite", "animation", "2d"]
 description = "A library for sprite hierarchy and scene management"
 license = "MIT"
@@ -22,6 +26,10 @@ git = "https://github.com/pistondevelopers/event"
 [dependencies.quack]
 
 git = "https://github.com/pistondevelopers/quack"
+
+[dependencies.interpolation]
+
+git = "https://github.com/pistondevelopers/interpolation"
 
 [dependencies.piston2d-graphics]
 
