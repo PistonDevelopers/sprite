@@ -19,9 +19,9 @@ path = "./src/lib.rs"
 
 git = "https://github.com/pistondevelopers/event"
 
-[dependencies.pistoncore-current]
+[dependencies.quack]
 
-git = "https://github.com/pistondevelopers/current"
+git = "https://github.com/pistondevelopers/quack"
 
 [dependencies.piston2d-graphics]
 

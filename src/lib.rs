@@ -7,7 +7,7 @@
 
 //! A library for sprite hierarchy and scene management
 
-extern crate current;
+extern crate quack;
 extern crate uuid;
 extern crate ai_behavior;
 extern crate event;
