@@ -122,7 +122,7 @@ impl<I: ImageSize> Scene<I> {
             println!("found");
             let i = index.unwrap();
             let animations = &mut self.running[sprite_id];
-            let (b, s, _) = animations.remove(i).unwrap();
+            let (b, s, _) = animations.remove(i);
             animations.push((b, s, true));
         }
     }
@@ -134,7 +134,7 @@ impl<I: ImageSize> Scene<I> {
             println!("found");
             let i = index.unwrap();
             let animations = &mut self.running[sprite_id];
-            let (b, s, _) = animations.remove(i).unwrap();
+            let (b, s, _) = animations.remove(i);
             animations.push((b, s, false));
         }
     }
@@ -145,7 +145,7 @@ impl<I: ImageSize> Scene<I> {
         if index.is_some() {
             let i = index.unwrap();
             let animations = &mut self.running[sprite_id];
-            let (b, s, paused) = animations.remove(i).unwrap();
+            let (b, s, paused) = animations.remove(i);
             animations.push((b, s, !paused));
         }
     }
@@ -193,7 +193,7 @@ impl<I: ImageSize> Scene<I> {
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
         let removed = match self.children_index.remove(&id) {
             Some(i) => {
-                let removed = self.children.remove(i).unwrap();
+                let removed = self.children.remove(i);
                 // Removing a element of vector will alter the index,
                 // update the mapping from uuid to index.
                 for index in range(i, self.children.len()) {
