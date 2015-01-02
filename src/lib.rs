@@ -12,6 +12,7 @@ extern crate uuid;
 extern crate ai_behavior;
 extern crate event;
 extern crate graphics;
+extern crate interpolation;
 
 pub use animation::{
     Animation,
@@ -39,7 +40,7 @@ pub use animation::{
 };
 pub use scene::Scene;
 pub use sprite::Sprite;
-pub use ease::{
+pub use interpolation::ease::{
     EaseFunction,
 
     EaseQuadraticIn,
@@ -82,8 +83,6 @@ pub use ease::{
     EaseBounceOut,
     EaseBounceInOut,
 };
-
-pub mod ease;
 
 mod animation;
 mod scene;
