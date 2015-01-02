@@ -203,7 +203,7 @@ impl<I: ImageSize> Sprite<I> {
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
         match self.children_index.remove(&id) {
             Some(i) => {
-                let removed = self.children.remove(i).unwrap();
+                let removed = self.children.remove(i);
                 // Removing a element of vector will alter the index,
                 // update the mapping from uuid to index.
                 for index in range(i, self.children.len()) {
