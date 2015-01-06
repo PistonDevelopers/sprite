@@ -42,7 +42,7 @@ pub use animation::AnimationState::{
 };
 
 /// Animations supported by Sprite
-#[deriving(Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Animation {
     /// duration, x, y
     ///
@@ -167,7 +167,7 @@ impl Animation {
 }
 
 /// The state of animation
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum AnimationState {
     /// time, begin_x, begin_y, change_x, change_y, duration
     MoveState(f64, Scalar, Scalar, Scalar, Scalar, f64),
