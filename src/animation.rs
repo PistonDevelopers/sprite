@@ -8,7 +8,7 @@ use ai_behavior::{
     Running,
 };
 
-use interpolation::ease::EaseFunction;
+use interpolation::EaseFunction;
 use sprite::Sprite;
 
 pub use animation::Animation::{
@@ -79,7 +79,7 @@ pub enum Animation {
     /// Toggle the sprite's visibility
     ToggleVisibility,
     /// duration, times
-    Blink(f64, uint),
+    Blink(f64, usize),
     /// duration
     ///
     /// Fade in the sprite, set its opacity from 0 to 1 in `dt` seconds
@@ -180,7 +180,7 @@ pub enum AnimationState {
     /// visible
     VisibilityState(bool),
     /// past_time, duration, blinked_times, total_times
-    BlinkState(f64, f64, uint, uint),
+    BlinkState(f64, f64, usize, usize),
     /// time, begin, change, duration
     FadeState(f64, f64, f64, f64),
     /// ease_function, animation
@@ -240,20 +240,20 @@ impl AnimationState {
                 let mut support_ease = true;
                 let (state, status, remain) = match *state {
                     box MoveState(t, bx, by, cx, cy, d) => {
-                        let factor = f.calc((t + dt) / d);
+                        let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_position(sprite, factor, t + dt,
                                         bx, by, cx, cy, d)
                     },
                     box RotateState(t, b, c, d) => {
-                        let factor = f.calc((t + dt) / d);
+                        let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_rotation(sprite, factor, t + dt, b, c, d)
                     },
                     box ScaleState(t, bx, by, cx, cy, d) => {
-                        let factor = f.calc((t + dt) / d);
+                        let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
                     },
                     box FadeState(t, b, c, d) => {
-                        let factor = f.calc((t + dt) / d);
+                        let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_opacity(sprite, factor, t + dt, b, c, d)
                     },
                     _ => {
