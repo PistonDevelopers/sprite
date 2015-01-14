@@ -21,7 +21,7 @@ use animation::{
 /// A scene is used to manage sprite's life and run animation with sprite
 pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
-    children_index: HashMap<Uuid, uint>,
+    children_index: HashMap<Uuid, usize>,
     running: HashMap<Uuid,
         Vec<(Behavior<Animation>, State<Animation, AnimationState>, bool)>>,
 }
@@ -90,7 +90,7 @@ impl<I: ImageSize> Scene<I> {
     /// Register animation with sprite
     pub fn run(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         use std::collections::hash_map::Entry::{ Vacant, Occupied };
-        let animations = match self.running.entry(&sprite_id) {
+        let animations = match self.running.entry(sprite_id) {
             Vacant(entry) => entry.insert(Vec::new()),
             Occupied(entry) => entry.into_mut()
         };
@@ -98,11 +98,11 @@ impl<I: ImageSize> Scene<I> {
         animations.push((animation.clone(), state, false));
     }
 
-    fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<uint> {
+    fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<usize> {
         let mut index = None;
         match self.running.get(&sprite_id) {
             Some(animations) => {
-                for i in range(0, animations.len()) {
+                for i in 0..animations.len() {
                     let (ref b, _, _) = animations[i];
                     if b == animation {
                         index = Some(i);
@@ -165,7 +165,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Get all the running animations in the scene
-    pub fn running(&self) -> uint {
+    pub fn running(&self) -> usize {
         let mut total = 0;
         for (_, animations) in self.running.iter() {
             total += animations.len();
@@ -196,7 +196,7 @@ impl<I: ImageSize> Scene<I> {
                 let removed = self.children.remove(i);
                 // Removing a element of vector will alter the index,
                 // update the mapping from uuid to index.
-                for index in range(i, self.children.len()) {
+                for index in i..self.children.len() {
                     let uuid = self.children[index].id();
                     self.children_index.insert(uuid, index);
                 }

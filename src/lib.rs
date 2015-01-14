@@ -3,7 +3,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 #![warn(dead_code)]
-#![feature(globs)]
+#![feature(box_syntax)]
 
 //! A library for sprite hierarchy and scene management
 
@@ -40,7 +40,7 @@ pub use animation::{
 };
 pub use scene::Scene;
 pub use sprite::Sprite;
-pub use interpolation::ease::EaseFunction;
+pub use interpolation::EaseFunction;
 
 mod animation;
 mod scene;

@@ -30,7 +30,7 @@ pub struct Sprite<I: ImageSize> {
     opacity: f32,
 
     children: Vec<Sprite<I>>,
-    children_index: HashMap<Uuid, uint>,
+    children_index: HashMap<Uuid, usize>,
 
     texture: Rc<I>,
 }
@@ -206,7 +206,7 @@ impl<I: ImageSize> Sprite<I> {
                 let removed = self.children.remove(i);
                 // Removing a element of vector will alter the index,
                 // update the mapping from uuid to index.
-                for index in range(i, self.children.len()) {
+                for index in i..self.children.len() {
                     let uuid = self.children[index].id();
                     self.children_index.insert(uuid, index);
                 }
