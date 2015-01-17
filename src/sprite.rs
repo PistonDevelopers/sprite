@@ -201,67 +201,50 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Remove the child by `id` from this sprite's children or grandchild
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
-        match self.children_index.remove(&id) {
-            Some(i) => {
-                let removed = self.children.remove(i);
-                // Removing a element of vector will alter the index,
-                // update the mapping from uuid to index.
-                for index in i..self.children.len() {
-                    let uuid = self.children[index].id();
-                    self.children_index.insert(uuid, index);
-                }
-                Some(removed)
-            },
-            None => {
-                for child in self.children.iter_mut() {
-                    match child.remove_child(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
-                }
-
-                None
+        if let Some(index) = self.children_index.remove(&id) {
+            let removed = self.children.remove(index);
+            // Removing a element of vector will alter the index,
+            // update the mapping from uuid to index.
+            for i in index..self.children.len() {
+                let uuid = self.children[i].id();
+                self.children_index.insert(uuid, i);
             }
+            Some(removed)
+        } else {
+            for child in self.children.iter_mut() {
+                if let Some(c) = child.remove_child(id.clone()) {
+                    return Some(c);
+                }
+            }
+            None
         }
     }
 
     /// Find the child by `id` from this sprite's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
-        match self.children_index.get(&id) {
-            Some(i) => { Some(&self.children[*i]) },
-            None => {
-                for child in self.children.iter() {
-                    match child.child(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
+        if let Some(index) = self.children_index.get(&id) {
+            Some(&self.children[*index])
+        } else {
+            for child in self.children.iter() {
+                if let Some(c) = child.child(id.clone()) {
+                    return Some(c);
                 }
-
-                None
             }
+            None
         }
     }
 
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
-        match self.children_index.get(&id) {
-            Some(i) => { Some(&mut self.children[*i]) },
-            None => {
-                for child in self.children.iter_mut() {
-                    match child.child_mut(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
+        if let Some(index) = self.children_index.get(&id) {
+            Some(&mut self.children[*index])
+        } else {
+            for child in self.children.iter_mut() {
+                if let Some(c) = child.child_mut(id.clone()) {
+                    return Some(c);
                 }
-
-                None
             }
+            None
         }
     }
 
@@ -328,4 +311,3 @@ impl<I: ImageSize> Sprite<I> {
         ]
     }
 }
-
