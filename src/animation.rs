@@ -266,14 +266,11 @@ impl AnimationState {
                     return (state, status, remain);
                 }
 
-                match state {
-                    None => {
-                        (None, status, remain)
-                    },
-                    Some(state) => {
-                        (Some(EaseState(f, box state)),
-                         status, remain)
-                    },
+                if let Some(state) = state {
+                    (Some(EaseState(f, box state)),
+                     status, remain)
+                } else {
+                    (None, status, remain)
                 }
             },
         }

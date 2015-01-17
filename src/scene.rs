@@ -100,62 +100,49 @@ impl<I: ImageSize> Scene<I> {
 
     fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<usize> {
         let mut index = None;
-        match self.running.get(&sprite_id) {
-            Some(animations) => {
-                for i in 0..animations.len() {
-                    let (ref b, _, _) = animations[i];
-                    if b == animation {
-                        index = Some(i);
-                        break;
-                    }
+        if let Some(animations) = self.running.get(&sprite_id) {
+            for i in 0..animations.len() {
+                let (ref b, _, _) = animations[i];
+                if b == animation {
+                    index = Some(i);
+                    break;
                 }
-            },
-            _ => {},
+            }
         }
         index
     }
 
     /// Pause a running animation of the sprite
     pub fn pause(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id.clone(), animation);
-        if index.is_some() {
-            println!("found");
-            let i = index.unwrap();
+        if let Some(index) = self.find(sprite_id.clone(), animation) {
             let animations = &mut self.running[sprite_id];
-            let (b, s, _) = animations.remove(i);
+            let (b, s, _) = animations.remove(index);
             animations.push((b, s, true));
         }
     }
 
     /// Resume a paused animation of the sprite
     pub fn resume(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id.clone(), animation);
-        if index.is_some() {
-            println!("found");
-            let i = index.unwrap();
+        if let Some(index) = self.find(sprite_id.clone(), animation) {
             let animations = &mut self.running[sprite_id];
-            let (b, s, _) = animations.remove(i);
+            let (b, s, _) = animations.remove(index);
             animations.push((b, s, false));
         }
     }
 
     /// Toggle an animation of the sprite
     pub fn toggle(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id.clone(), animation);
-        if index.is_some() {
-            let i = index.unwrap();
+        if let Some(index) = self.find(sprite_id.clone(), animation) {
             let animations = &mut self.running[sprite_id];
-            let (b, s, paused) = animations.remove(i);
+            let (b, s, paused) = animations.remove(index);
             animations.push((b, s, !paused));
         }
     }
 
     /// Stop a running animation of the sprite
     pub fn stop(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
-        let index = self.find(sprite_id.clone(), animation);
-        if index.is_some() {
-            let i = index.unwrap();
-            &mut self.running[sprite_id].remove(i);
+        if let Some(index) = self.find(sprite_id.clone(), animation) {
+            &mut self.running[sprite_id].remove(index);
         }
     }
 
@@ -191,29 +178,22 @@ impl<I: ImageSize> Scene<I> {
     /// Remove the child by `id` from the scene's children or grandchild
     /// will stop all the animations run by this child
     pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
-        let removed = match self.children_index.remove(&id) {
-            Some(i) => {
-                let removed = self.children.remove(i);
-                // Removing a element of vector will alter the index,
-                // update the mapping from uuid to index.
-                for index in i..self.children.len() {
-                    let uuid = self.children[index].id();
-                    self.children_index.insert(uuid, index);
-                }
-                Some(removed)
-            },
-            None => {
-                for child in self.children.iter_mut() {
-                    match child.remove_child(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
-                }
-
-                None
+        let removed = if let Some(index) = self.children_index.remove(&id) {
+            let removed = self.children.remove(index);
+            // Removing a element of vector will alter the index,
+            // update the mapping from uuid to index.
+            for i in index..self.children.len() {
+                let uuid = self.children[i].id();
+                self.children_index.insert(uuid, i);
             }
+            Some(removed)
+        } else {
+            for child in self.children.iter_mut() {
+                if let Some(c) = child.remove_child(id.clone()) {
+                    return Some(c);
+                }
+            }
+            None
         };
 
         if removed.is_some() {
@@ -225,39 +205,29 @@ impl<I: ImageSize> Scene<I> {
 
     /// Find the child by `id` from the scene's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
-        match self.children_index.get(&id) {
-            Some(i) => { Some(&self.children[*i]) },
-            None => {
-                for child in self.children.iter() {
-                    match child.child(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
+        if let Some(index) = self.children_index.get(&id) {
+            Some(&self.children[*index])
+        } else {
+            for child in self.children.iter() {
+                if let Some(c) = child.child(id.clone()) {
+                    return Some(c);
                 }
-
-                None
             }
+            None
         }
     }
 
     /// Find the child by `id` from this sprite's children or grandchild, mutability
     pub fn child_mut(&mut self, id: Uuid) -> Option<&mut Sprite<I>> {
-        match self.children_index.get(&id) {
-            Some(i) => { Some(&mut self.children[*i]) },
-            None => {
-                for child in self.children.iter_mut() {
-                    match child.child_mut(id.clone()) {
-                        Some(c) => {
-                            return Some(c);
-                        }
-                        _ => {}
-                    }
+        if let Some(index) = self.children_index.get(&id) {
+            Some(&mut self.children[*index])
+        } else {
+            for child in self.children.iter_mut() {
+                if let Some(c) = child.child_mut(id.clone()) {
+                    return Some(c);
                 }
-
-                None
             }
+            None
         }
     }
 }
