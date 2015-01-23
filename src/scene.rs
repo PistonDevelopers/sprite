@@ -81,7 +81,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Render this scene
-    pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
+    pub fn draw<B: BackEnd<Texture = I>>(&self, c: &Context, b: &mut B) {
         for child in self.children.iter() {
             child.draw(c, b);
         }

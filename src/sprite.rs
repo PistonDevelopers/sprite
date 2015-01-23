@@ -255,7 +255,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Draw this sprite and its children
-    pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
+    pub fn draw<B: BackEnd<Texture = I>>(&self, c: &Context, b: &mut B) {
         use graphics::*;
 
         if !self.visible {
