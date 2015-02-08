@@ -3,7 +3,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 #![warn(dead_code)]
-#![feature(box_syntax)]
+#![feature(box_syntax, core)]
 
 //! A library for sprite hierarchy and scene management
 
