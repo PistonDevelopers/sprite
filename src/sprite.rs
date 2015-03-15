@@ -1,16 +1,18 @@
-use quack::{ Set };
+use quack::Set;
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use uuid::Uuid;
 
-use graphics;
-use graphics::{ Context, BackEnd, ImageSize };
+use graphics::{ self, BackEnd, ImageSize };
 use graphics::internal::{
     Rectangle,
     Vec2d,
 };
-use graphics::vecmath::Scalar;
+use graphics::vecmath::{
+    Scalar,
+    Matrix2d
+};
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -255,7 +257,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Draw this sprite and its children
-    pub fn draw<B: BackEnd<Texture = I>>(&self, c: &Context, b: &mut B) {
+    pub fn draw<B: BackEnd<Texture = I>>(&self, t: Matrix2d, b: &mut B) {
         use graphics::*;
 
         if !self.visible {
@@ -267,11 +269,11 @@ impl<I: ImageSize> Sprite<I> {
         let h = h as f64;
         let anchor = [self.anchor[0] * w, self.anchor[1] * h];
 
-        let transformed = c.trans(self.position[0], self.position[1])
+        let transformed = t.trans(self.position[0], self.position[1])
                            .rot_deg(self.rotation)
                            .scale(self.scale[0], self.scale[1]);
 
-        let mut model = transformed.clone();
+        let mut model = transformed;
 
         if self.flip_x {
             model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
@@ -281,19 +283,21 @@ impl<I: ImageSize> Sprite<I> {
             model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
         }
 
+        let draw_state = default_draw_state();
+
         // for debug: bounding_box
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
             .set(Color([1.0, 1.0, 1.0, self.opacity]))
             .set(Rect([-anchor[0], -anchor[1], w, h]))
-            .draw(&*self.texture, &model, b);
+            .draw(&*self.texture, draw_state, model, b);
 
         // for debug: anchor point
         //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
 
         for child in self.children.iter() {
-            child.draw(&transformed, b);
+            child.draw(transformed, b);
         }
     }
 
