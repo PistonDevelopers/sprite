@@ -1,8 +1,8 @@
-
 use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::*;
+use graphics::vecmath::Matrix2d;
 
 use event::GenericEvent;
 use ai_behavior::{
@@ -81,9 +81,9 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Render this scene
-    pub fn draw<B: BackEnd<Texture = I>>(&self, c: &Context, b: &mut B) {
+    pub fn draw<B: BackEnd<Texture = I>>(&self, t: Matrix2d, b: &mut B) {
         for child in self.children.iter() {
-            child.draw(c, b);
+            child.draw(t, b);
         }
     }
 

@@ -1,4 +1,3 @@
-
 use graphics::ImageSize;
 use graphics::vecmath::Scalar;
 
