@@ -115,7 +115,7 @@ impl<I: ImageSize> Scene<I> {
     /// Pause a running animation of the sprite
     pub fn pause(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         if let Some(index) = self.find(sprite_id.clone(), animation) {
-            let animations = &mut self.running[sprite_id];
+            let animations = self.running.get_mut(&sprite_id).unwrap();
             let (b, s, _) = animations.remove(index);
             animations.push((b, s, true));
         }
@@ -124,7 +124,7 @@ impl<I: ImageSize> Scene<I> {
     /// Resume a paused animation of the sprite
     pub fn resume(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         if let Some(index) = self.find(sprite_id.clone(), animation) {
-            let animations = &mut self.running[sprite_id];
+            let animations = self.running.get_mut(&sprite_id).unwrap();
             let (b, s, _) = animations.remove(index);
             animations.push((b, s, false));
         }
@@ -133,7 +133,7 @@ impl<I: ImageSize> Scene<I> {
     /// Toggle an animation of the sprite
     pub fn toggle(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         if let Some(index) = self.find(sprite_id.clone(), animation) {
-            let animations = &mut self.running[sprite_id];
+            let animations = self.running.get_mut(&sprite_id).unwrap();
             let (b, s, paused) = animations.remove(index);
             animations.push((b, s, !paused));
         }
@@ -142,7 +142,7 @@ impl<I: ImageSize> Scene<I> {
     /// Stop a running animation of the sprite
     pub fn stop(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         if let Some(index) = self.find(sprite_id.clone(), animation) {
-            &mut self.running[sprite_id].remove(index);
+            self.running.get_mut(&sprite_id).unwrap().remove(index);
         }
     }
 
