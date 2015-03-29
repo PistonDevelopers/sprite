@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::marker::Reflect;
 use uuid::Uuid;
 
 use graphics::*;
@@ -37,7 +38,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Update animation's state
-    pub fn event<E: GenericEvent>(&mut self, e: &E) {
+    pub fn event<E>(&mut self, e: &E) where E: GenericEvent + Reflect {
         // regenerate the animations and their states
         let running = self.running.clone();
         self.running.clear();
