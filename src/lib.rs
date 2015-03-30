@@ -1,7 +1,7 @@
 #![crate_name = "sprite"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(core, box_syntax, box_patterns)]
+#![feature(box_syntax, box_patterns)]
 
 //! A library for sprite hierarchy and scene management
 
