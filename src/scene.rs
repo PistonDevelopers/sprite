@@ -19,16 +19,16 @@ use animation::{
 };
 
 /// A scene is used to manage sprite's life and run animation with sprite
-pub struct Scene<I: ImageSize> {
+pub struct Scene<'a, I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, usize>,
-    running: HashMap<Uuid,
+    running: HashMap<&'a Uuid,
         Vec<(Behavior<Animation>, State<Animation, AnimationState>, bool)>>,
 }
 
-impl<I: ImageSize> Scene<I> {
+impl<'a, I: ImageSize> Scene<'a, I> {
     /// Create a new scene
-    pub fn new() -> Scene<I> {
+    pub fn new() -> Scene<'a, I> {
         Scene {
             children: Vec::new(),
             children_index: HashMap::new(),
@@ -88,7 +88,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Register animation with sprite
-    pub fn run(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
+    pub fn run<'b>(&'b mut self, sprite_id: &'a Uuid, animation: &'b Behavior<Animation>) {
         use std::collections::hash_map::Entry::{ Vacant, Occupied };
         let animations = match self.running.entry(sprite_id) {
             Vacant(entry) => entry.insert(Vec::new()),
@@ -100,7 +100,7 @@ impl<I: ImageSize> Scene<I> {
 
     fn find(&self, sprite_id: &Uuid, animation: &Behavior<Animation>) -> Option<usize> {
         let mut index = None;
-        if let Some(animations) = self.running.get(&sprite_id) {
+        if let Some(animations) = self.running.get(sprite_id) {
             for i in 0..animations.len() {
                 let (ref b, _, _) = animations[i];
                 if b == animation {
