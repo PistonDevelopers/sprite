@@ -1,13 +1,13 @@
 [package]
 
 name = "piston2d-sprite"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     "Coeuvre Wong <coeuvre@gmail.com>",
     "zummenix",
     "bvssvni <bvssvni@gmail.com>"
 ]
-keywords = ["sprite", "animation", "2d"]
+keywords = ["sprite", "animation", "2d", "piston"]
 description = "A library for sprite hierarchy and scene management"
 license = "MIT"
 readme = "README.md"
@@ -20,26 +20,26 @@ name = "sprite"
 path = "./src/lib.rs"
 
 [dependencies.pistoncore-event]
-
 git = "https://github.com/pistondevelopers/event"
+#version = "0.0.12"
 
 [dependencies.quack]
-
 git = "https://github.com/pistondevelopers/quack"
+#version = "0.0.13"
 
 [dependencies.interpolation]
-
 git = "https://github.com/pistondevelopers/interpolation"
+#version = "0.0.3"
 
 [dependencies.piston2d-graphics]
-
 git = "https://github.com/pistondevelopers/graphics"
+#version = "0.0.26"
 
 [dependencies.piston-ai_behavior]
-
 git = "https://github.com/pistondevelopers/ai_behavior"
+#version = "0.0.3"
 
 [dependencies.uuid]
-
 git = "https://github.com/rust-lang/uuid"
+#version = "0.1.13"
 
