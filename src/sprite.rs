@@ -1,18 +1,10 @@
-use quack::Set;
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use uuid::Uuid;
 
-use graphics::{ self, BackEnd, ImageSize };
-use graphics::internal::{
-    Rectangle,
-    Vec2d,
-};
-use graphics::vecmath::{
-    Scalar,
-    Matrix2d
-};
+use graphics::{ self, Graphics, ImageSize };
+use graphics::math::{ Scalar, Matrix2d, Vec2d };
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -257,7 +249,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Draw this sprite and its children
-    pub fn draw<B: BackEnd<Texture = I>>(&self, t: Matrix2d, b: &mut B) {
+    pub fn draw<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B) {
         use graphics::*;
 
         if !self.visible {
@@ -289,8 +281,8 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .set(Color([1.0, 1.0, 1.0, self.opacity]))
-            .set(Rect([-anchor[0], -anchor[1], w, h]))
+            .color([1.0, 1.0, 1.0, self.opacity])
+            .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
         // for debug: anchor point
@@ -302,7 +294,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Get the sprite's bounding box
-    pub fn bounding_box(&self) -> Rectangle {
+    pub fn bounding_box(&self) -> graphics::types::Rectangle {
         let (w, h) = self.texture.get_size();
         let w = w as f64 * self.scale[0];
         let h = h as f64 * self.scale[1];
