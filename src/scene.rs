@@ -19,16 +19,16 @@ use animation::{
 };
 
 /// A scene is used to manage sprite's life and run animation with sprite
-pub struct Scene<'a, I: ImageSize> {
+pub struct Scene<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, usize>,
-    running: HashMap<&'a Uuid,
+    running: HashMap<Uuid,
         Vec<(Behavior<Animation>, State<Animation, AnimationState>, bool)>>,
 }
 
-impl<'a, I: ImageSize> Scene<'a, I> {
+impl<I: ImageSize> Scene<I> {
     /// Create a new scene
-    pub fn new() -> Scene<'a, I> {
+    pub fn new() -> Scene<I> {
         Scene {
             children: Vec::new(),
             children_index: HashMap::new(),
@@ -88,9 +88,9 @@ impl<'a, I: ImageSize> Scene<'a, I> {
     }
 
     /// Register animation with sprite
-    pub fn run<'b>(&'b mut self, sprite_id: &'a Uuid, animation: &'b Behavior<Animation>) {
+    pub fn run<'b>(&'b mut self, sprite_id: &Uuid, animation: &'b Behavior<Animation>) {
         use std::collections::hash_map::Entry::{ Vacant, Occupied };
-        let animations = match self.running.entry(sprite_id) {
+        let animations = match self.running.entry(sprite_id.clone()) {
             Vacant(entry) => entry.insert(Vec::new()),
             Occupied(entry) => entry.into_mut()
         };
