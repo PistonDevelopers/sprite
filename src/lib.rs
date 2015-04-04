@@ -1,11 +1,9 @@
 #![crate_name = "sprite"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(box_syntax, box_patterns)]
 
 //! A library for sprite hierarchy and scene management
 
-extern crate quack;
 extern crate uuid;
 extern crate ai_behavior;
 extern crate event;

@@ -21,15 +21,11 @@ path = "./src/lib.rs"
 
 [dependencies.pistoncore-event]
 git = "https://github.com/pistondevelopers/event"
-#version = "0.0.12"
-
-[dependencies.quack]
-git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.13"
+#version = "0.1.0"
 
 [dependencies.interpolation]
 git = "https://github.com/pistondevelopers/interpolation"
-#version = "0.0.3"
+#version = "0.0.4"
 
 [dependencies.piston2d-graphics]
 git = "https://github.com/pistondevelopers/graphics"
@@ -41,5 +37,5 @@ git = "https://github.com/pistondevelopers/ai_behavior"
 
 [dependencies.uuid]
 git = "https://github.com/rust-lang/uuid"
-#version = "0.1.13"
+#version = "0.1.15"
 

@@ -1,5 +1,5 @@
 use graphics::ImageSize;
-use graphics::vecmath::Scalar;
+use graphics::math::Scalar;
 
 use ai_behavior::{
     Status,
@@ -159,7 +159,7 @@ impl Animation {
                 FadeState(0.0, b, d - b, dur)
             },
             Ease(f, ref animation) => {
-                EaseState(f, box animation.to_state(sprite))
+                EaseState(f, Box::new(animation.to_state(sprite)))
             },
         }
     }
@@ -237,21 +237,21 @@ impl AnimationState {
             },
             EaseState(f, ref state) => {
                 let mut support_ease = true;
-                let (state, status, remain) = match *state {
-                    box MoveState(t, bx, by, cx, cy, d) => {
+                let (state, status, remain) = match &**state {
+                    &MoveState(t, bx, by, cx, cy, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_position(sprite, factor, t + dt,
                                         bx, by, cx, cy, d)
                     },
-                    box RotateState(t, b, c, d) => {
+                    &RotateState(t, b, c, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_rotation(sprite, factor, t + dt, b, c, d)
                     },
-                    box ScaleState(t, bx, by, cx, cy, d) => {
+                    &ScaleState(t, bx, by, cx, cy, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
                     },
-                    box FadeState(t, b, c, d) => {
+                    &FadeState(t, b, c, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_opacity(sprite, factor, t + dt, b, c, d)
                     },
@@ -266,7 +266,7 @@ impl AnimationState {
                 }
 
                 if let Some(state) = state {
-                    (Some(EaseState(f, box state)),
+                    (Some(EaseState(f, Box::new(state))),
                      status, remain)
                 } else {
                     (None, status, remain)
