@@ -37,5 +37,5 @@ git = "https://github.com/pistondevelopers/ai_behavior"
 
 [dependencies.uuid]
 git = "https://github.com/rust-lang/uuid"
-#version = "0.1.15"
+#version = "0.1.16"
 
