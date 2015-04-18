@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::{ self, Graphics, ImageSize };
-use graphics::math::{ Scalar, Matrix2d, Vec2d };
+use graphics::math::{ Scalar, Matrix2d, Vec2d, Vec3d };
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -17,6 +17,8 @@ pub struct Sprite<I: ImageSize> {
     position: Vec2d,
     rotation: Scalar,
     scale: Vec2d,
+    color: Vec3d,
+
 
     flip_x: bool,
     flip_y: bool,
@@ -42,6 +44,7 @@ impl<I: ImageSize> Sprite<I> {
             position: [0.0, 0.0],
             rotation: 0.0,
             scale: [1.0, 1.0],
+            color: [1.0,0.0,0.0],
 
             flip_x: false,
             flip_y: false,
@@ -96,6 +99,7 @@ impl<I: ImageSize> Sprite<I> {
     pub fn set_position(&mut self, x: Scalar, y: Scalar) {
         self.position = [x, y];
     }
+
 
     /// Get the sprite's rotation (in degree)
     #[inline(always)]
@@ -281,7 +285,7 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .color([1.0, 1.0, 1.0, self.opacity])
+            .color([self.color[0], self.color[1], self.color[2], self.opacity])
             .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
