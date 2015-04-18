@@ -44,7 +44,7 @@ impl<I: ImageSize> Sprite<I> {
             position: [0.0, 0.0],
             rotation: 0.0,
             scale: [1.0, 1.0],
-            color: [0.0,1.0,0.0],
+            color: [1.0,1.0,1.0],
 
             flip_x: false,
             flip_y: false,
