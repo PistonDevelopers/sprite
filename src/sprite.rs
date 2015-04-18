@@ -44,7 +44,7 @@ impl<I: ImageSize> Sprite<I> {
             position: [0.0, 0.0],
             rotation: 0.0,
             scale: [1.0, 1.0],
-            color: [1.0,1.0,1.0],
+            color: [0.0,1.0,0.0],
 
             flip_x: false,
             flip_y: false,
@@ -100,17 +100,19 @@ impl<I: ImageSize> Sprite<I> {
         self.position = [x, y];
     }
 
+/*
     /// Set the sprite's draw color (tint)
     #[inline(always)]
     pub fn set_color(&mut self, r: f64, g: f64, b: f64) {
         self.color = [r, g, b];
     }
 
-    /// get the sprite's color.
+    /// get the sprite's color.s
     #[inline(always)]
     pub fn color(&self) -> (f64, f64, f64) {
         (self.color[0], self.color[1], self.color[2])
     }
+    */
 
     /// Get the sprite's rotation (in degree)
     #[inline(always)]
