@@ -308,6 +308,52 @@ impl<I: ImageSize> Sprite<I> {
         }
     }
 
+    /// Draw this sprite and its children with color
+    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: Vec3d) {
+        use graphics::*;
+
+        if !self.visible {
+            return;
+        }
+
+        let (w, h) = self.texture.get_size();
+        let w = w as f64;
+        let h = h as f64;
+        let anchor = [self.anchor[0] * w, self.anchor[1] * h];
+
+        let transformed = t.trans(self.position[0], self.position[1])
+                           .rot_deg(self.rotation)
+                           .scale(self.scale[0], self.scale[1]);
+
+        let mut model = transformed;
+
+        if self.flip_x {
+            model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
+        }
+
+        if self.flip_y {
+            model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
+        }
+
+        let draw_state = default_draw_state();
+
+        // for debug: bounding_box
+        //model.rgb(1.0, 0.0, 0.0).draw(b);
+
+        graphics::Image::new()
+            .color([c[0] as f32, c[1] as f32, c[2] as f32, self.opacity])
+            .rect([-anchor[0], -anchor[1], w, h])
+            .draw(&*self.texture, draw_state, model, b);
+
+        // for debug: anchor point
+        //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
+
+        for child in self.children.iter() {
+            child.draw_tinted(transformed, b, c);
+        }
+    }
+
+
     /// Get the sprite's bounding box
     pub fn bounding_box(&self) -> graphics::types::Rectangle {
         let (w, h) = self.texture.get_size();

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::{ Graphics, ImageSize };
-use graphics::math::Matrix2d;
+use graphics::math::{ Matrix2d, Vec3d };
 
 use event::GenericEvent;
 use ai_behavior::{
@@ -87,6 +87,13 @@ impl<I: ImageSize> Scene<I> {
         }
     }
 
+    /// Render this scene with tint
+    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: Vec3d) {
+        for child in self.children.iter() {
+            child.draw_tinted(t,b,c)
+        }
+    }
+
     /// Register animation with sprite
     pub fn run(&mut self, sprite_id: Uuid, animation: &Behavior<Animation>) {
         use std::collections::hash_map::Entry::{ Vacant, Occupied };
@@ -144,7 +151,7 @@ impl<I: ImageSize> Scene<I> {
         if let Some(index) = self.find(sprite_id, animation) {
             self.running.get_mut(&sprite_id).unwrap().remove(index);
         }
-    } 
+    }
 
     /// Stop all running animations of the sprite
     pub fn stop_all(&mut self, sprite_id: Uuid) {
