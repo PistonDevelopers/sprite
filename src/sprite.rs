@@ -285,7 +285,7 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .color([self.color[0], self.color[1], self.color[2], self.opacity])
+            .color([self.color[0] as f32, self.color[1] as f32, self.color[2] as f32, self.opacity])
             .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
