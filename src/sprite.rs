@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::{ self, Graphics, ImageSize };
-use graphics::math::{ Scalar, Matrix2d, Vec2d };
+use graphics::math::{ Scalar, Matrix2d, Vec2d, Vec3d };
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -17,6 +17,8 @@ pub struct Sprite<I: ImageSize> {
     position: Vec2d,
     rotation: Scalar,
     scale: Vec2d,
+    color: Vec3d,
+
 
     flip_x: bool,
     flip_y: bool,
@@ -42,6 +44,7 @@ impl<I: ImageSize> Sprite<I> {
             position: [0.0, 0.0],
             rotation: 0.0,
             scale: [1.0, 1.0],
+            color: [1.0,1.0,1.0],
 
             flip_x: false,
             flip_y: false,
@@ -95,6 +98,18 @@ impl<I: ImageSize> Sprite<I> {
     #[inline(always)]
     pub fn set_position(&mut self, x: Scalar, y: Scalar) {
         self.position = [x, y];
+    }
+
+    /// Set the sprite's draw color (tint)
+    #[inline(always)]
+    pub fn set_color(&mut self, r: f64, g: f64, b: f64) {
+        self.color = [r, g, b];
+    }
+
+    /// get the sprite's color.s
+    #[inline(always)]
+    pub fn color(&self) -> (f64, f64, f64) {
+        (self.color[0], self.color[1], self.color[2])
     }
 
     /// Get the sprite's rotation (in degree)
@@ -281,7 +296,7 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .color([1.0, 1.0, 1.0, self.opacity])
+            .color([self.color[0] as f32, self.color[1] as f32, self.color[2] as f32, self.opacity])
             .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
@@ -292,6 +307,52 @@ impl<I: ImageSize> Sprite<I> {
             child.draw(transformed, b);
         }
     }
+
+    /// Draw this sprite and its children with color
+    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: Vec3d) {
+        use graphics::*;
+
+        if !self.visible {
+            return;
+        }
+
+        let (w, h) = self.texture.get_size();
+        let w = w as f64;
+        let h = h as f64;
+        let anchor = [self.anchor[0] * w, self.anchor[1] * h];
+
+        let transformed = t.trans(self.position[0], self.position[1])
+                           .rot_deg(self.rotation)
+                           .scale(self.scale[0], self.scale[1]);
+
+        let mut model = transformed;
+
+        if self.flip_x {
+            model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
+        }
+
+        if self.flip_y {
+            model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
+        }
+
+        let draw_state = default_draw_state();
+
+        // for debug: bounding_box
+        //model.rgb(1.0, 0.0, 0.0).draw(b);
+
+        graphics::Image::new()
+            .color([c[0] as f32, c[1] as f32, c[2] as f32, self.opacity])
+            .rect([-anchor[0], -anchor[1], w, h])
+            .draw(&*self.texture, draw_state, model, b);
+
+        // for debug: anchor point
+        //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
+
+        for child in self.children.iter() {
+            child.draw_tinted(transformed, b, c);
+        }
+    }
+
 
     /// Get the sprite's bounding box
     pub fn bounding_box(&self) -> graphics::types::Rectangle {
