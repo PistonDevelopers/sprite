@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::{ Graphics, ImageSize };
-use graphics::math::{ Matrix2d, Vec3d };
+use graphics::math::{ Matrix2d };
 
 use event::GenericEvent;
 use ai_behavior::{
@@ -88,7 +88,7 @@ impl<I: ImageSize> Scene<I> {
     }
 
     /// Render this scene with tint
-    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: Vec3d) {
+    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: [f32;3]) {
         for child in self.children.iter() {
             child.draw_tinted(t,b,c)
         }
