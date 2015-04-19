@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use graphics::{ self, Graphics, ImageSize };
-use graphics::math::{ Scalar, Matrix2d, Vec2d, Vec3d };
+use graphics::math::{ Scalar, Matrix2d, Vec2d };
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -17,7 +17,7 @@ pub struct Sprite<I: ImageSize> {
     position: Vec2d,
     rotation: Scalar,
     scale: Vec2d,
-    color: Vec3d,
+    color: [f32;3],
 
 
     flip_x: bool,
@@ -102,13 +102,13 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Set the sprite's draw color (tint)
     #[inline(always)]
-    pub fn set_color(&mut self, r: f64, g: f64, b: f64) {
+    pub fn set_color(&mut self, r: f32, g: f32, b: f32) {
         self.color = [r, g, b];
     }
 
     /// get the sprite's color.s
     #[inline(always)]
-    pub fn color(&self) -> (f64, f64, f64) {
+    pub fn color(&self) -> (f32, f32, f32) {
         (self.color[0], self.color[1], self.color[2])
     }
 
@@ -296,7 +296,7 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .color([self.color[0] as f32, self.color[1] as f32, self.color[2] as f32, self.opacity])
+            .color([self.color[0], self.color[1], self.color[2], self.opacity])
             .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
@@ -309,7 +309,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Draw this sprite and its children with color
-    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: Vec3d) {
+    pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: [f32;3]) {
         use graphics::*;
 
         if !self.visible {
@@ -341,7 +341,7 @@ impl<I: ImageSize> Sprite<I> {
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
         graphics::Image::new()
-            .color([c[0] as f32, c[1] as f32, c[2] as f32, self.opacity])
+            .color([c[0], c[1], c[2], self.opacity])
             .rect([-anchor[0], -anchor[1], w, h])
             .draw(&*self.texture, draw_state, model, b);
 
