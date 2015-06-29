@@ -65,7 +65,7 @@ impl<I: ImageSize> Sprite<I> {
     }
 
     /// Whether or not the sprite is visible
-    pub fn visible(&self) -> bool {
+    pub fn get_visible(&self) -> bool {
         self.visible
     }
 
@@ -78,7 +78,7 @@ impl<I: ImageSize> Sprite<I> {
     ///
     /// The value is normalized. Default value is [0.5, 0.5] (the center of texture)
     #[inline(always)]
-    pub fn anchor(&self) -> (Scalar, Scalar) {
+    pub fn get_anchor(&self) -> (Scalar, Scalar) {
         (self.anchor[0], self.anchor[1])
     }
 
@@ -90,7 +90,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Get the sprite's position
     #[inline(always)]
-    pub fn position(&self) -> (Scalar, Scalar) {
+    pub fn get_position(&self) -> (Scalar, Scalar) {
         (self.position[0], self.position[1])
     }
 
@@ -108,13 +108,13 @@ impl<I: ImageSize> Sprite<I> {
 
     /// get the sprite's color.s
     #[inline(always)]
-    pub fn color(&self) -> (f32, f32, f32) {
+    pub fn get_color(&self) -> (f32, f32, f32) {
         (self.color[0], self.color[1], self.color[2])
     }
 
     /// Get the sprite's rotation (in degree)
     #[inline(always)]
-    pub fn rotation(&self) -> Scalar {
+    pub fn get_rotation(&self) -> Scalar {
         self.rotation
     }
 
@@ -126,7 +126,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Get the sprite's scale
     #[inline(always)]
-    pub fn scale(&self) -> (Scalar, Scalar) {
+    pub fn get_scale(&self) -> (Scalar, Scalar) {
         (self.scale[0], self.scale[1])
     }
 
@@ -146,7 +146,7 @@ impl<I: ImageSize> Sprite<I> {
     /// If you want to flip the `anchor` too,
     /// and/or to flip the children too use: sprite.scale.x *= -1;
     #[inline(always)]
-    pub fn flip_x(&self) -> bool {
+    pub fn get_flip_x(&self) -> bool {
         self.flip_x
     }
 
@@ -166,7 +166,7 @@ impl<I: ImageSize> Sprite<I> {
     /// If you want to flip the `anchor` too,
     /// and/or to flip the children too use: sprite.scale.y *= -1;
     #[inline(always)]
-    pub fn flip_y(&self) -> bool {
+    pub fn get_flip_y(&self) -> bool {
         self.flip_y
     }
 
@@ -178,7 +178,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Get the sprite's opacity
     #[inline(always)]
-    pub fn opacity(&self) -> f32 {
+    pub fn get_opacity(&self) -> f32 {
         self.opacity
     }
 
@@ -190,7 +190,7 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Get the sprite's texture
     #[inline(always)]
-    pub fn texture(&self) -> &Rc<I> {
+    pub fn get_texture(&self) -> &Rc<I> {
         &self.texture
     }
 

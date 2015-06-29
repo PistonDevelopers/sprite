@@ -102,35 +102,35 @@ impl Animation {
     pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> AnimationState {
         match *self {
             MoveTo(dur, dx, dy) => {
-                let (bx, by) = sprite.position();
+                let (bx, by) = sprite.get_position();
                 MoveState(0.0, bx, by, dx - bx, dy - by, dur)
             },
             MoveBy(dur, cx, cy) => {
-                let (bx, by) = sprite.position();
+                let (bx, by) = sprite.get_position();
                 MoveState(0.0, bx, by, cx, cy, dur)
             },
             RotateTo(dur, d) => {
-                let b = sprite.rotation();
+                let b = sprite.get_rotation();
                 RotateState(0.0, b, d - b, dur)
             },
             RotateBy(dur, c) => {
-                let b = sprite.rotation();
+                let b = sprite.get_rotation();
                 RotateState(0.0, b, c, dur)
             },
             ScaleTo(dur, dx, dy) => {
-                let (bx, by) = sprite.scale();
+                let (bx, by) = sprite.get_scale();
                 ScaleState(0.0, bx, by, dx - bx, dy - by, dur)
             },
             ScaleBy(dur, cx, cy) => {
-                let (bx, by) = sprite.scale();
+                let (bx, by) = sprite.get_scale();
                 ScaleState(0.0, bx, by, cx, cy, dur)
             },
             FlipX(flip_x) => {
-                let flip_y = sprite.flip_y();
+                let flip_y = sprite.get_flip_y();
                 FlipState(flip_x, flip_y)
             },
             FlipY(flip_y) => {
-                let flip_x = sprite.flip_x();
+                let flip_x = sprite.get_flip_x();
                 FlipState(flip_x, flip_y)
             },
             Show => {
@@ -140,22 +140,22 @@ impl Animation {
                 VisibilityState(false)
             },
             ToggleVisibility => {
-                let visible = sprite.visible();
+                let visible = sprite.get_visible();
                 VisibilityState(!visible)
             },
             Blink(dur, times) => {
                 BlinkState(0.0, dur, 0, 2 * times)
             },
             FadeIn(dur) => {
-                let b = sprite.opacity() as f64;
+                let b = sprite.get_opacity() as f64;
                 FadeState(0.0, b, 1.0 - b, dur)
             },
             FadeOut(dur) => {
-                let b = sprite.opacity() as f64;
+                let b = sprite.get_opacity() as f64;
                 FadeState(0.0, b, 0.0 - b, dur)
             },
             FadeTo(dur, d) => {
-                let b = sprite.opacity() as f64;
+                let b = sprite.get_opacity() as f64;
                 FadeState(0.0, b, d - b, dur)
             },
             Ease(f, ref animation) => {
@@ -218,7 +218,7 @@ impl AnimationState {
             BlinkState(past, dur, cur, total) => {
                 let period = dur / total as f64;
                 if past + dt >= (cur + 1) as f64 * period {
-                    let visible = sprite.visible();
+                    let visible = sprite.get_visible();
                     sprite.set_visible(!visible);
                     if past + dt >= dur {
                         (None, Success, past + dt - dur)
