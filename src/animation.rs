@@ -10,17 +10,6 @@ use ai_behavior::{
 use interpolation::EaseFunction;
 use sprite::Sprite;
 
-pub use animation::AnimationState::{
-    MoveState,
-    RotateState,
-    ScaleState,
-    FlipState,
-    VisibilityState,
-    BlinkState,
-    FadeState,
-    EaseState,
-};
-
 /// Animations supported by Sprite
 #[derive(Clone, PartialEq)]
 pub enum Animation {
@@ -82,67 +71,68 @@ impl Animation {
     /// Generate a new state from Animation with specified Sprite
     pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> AnimationState {
         use Animation::*;
+        use AnimationState as S;
 
         match *self {
             MoveTo(dur, dx, dy) => {
                 let (bx, by) = sprite.get_position();
-                MoveState(0.0, bx, by, dx - bx, dy - by, dur)
+                S::MoveState(0.0, bx, by, dx - bx, dy - by, dur)
             },
             MoveBy(dur, cx, cy) => {
                 let (bx, by) = sprite.get_position();
-                MoveState(0.0, bx, by, cx, cy, dur)
+                S::MoveState(0.0, bx, by, cx, cy, dur)
             },
             RotateTo(dur, d) => {
                 let b = sprite.get_rotation();
-                RotateState(0.0, b, d - b, dur)
+                S::RotateState(0.0, b, d - b, dur)
             },
             RotateBy(dur, c) => {
                 let b = sprite.get_rotation();
-                RotateState(0.0, b, c, dur)
+                S::RotateState(0.0, b, c, dur)
             },
             ScaleTo(dur, dx, dy) => {
                 let (bx, by) = sprite.get_scale();
-                ScaleState(0.0, bx, by, dx - bx, dy - by, dur)
+                S::ScaleState(0.0, bx, by, dx - bx, dy - by, dur)
             },
             ScaleBy(dur, cx, cy) => {
                 let (bx, by) = sprite.get_scale();
-                ScaleState(0.0, bx, by, cx, cy, dur)
+                S::ScaleState(0.0, bx, by, cx, cy, dur)
             },
             FlipX(flip_x) => {
                 let flip_y = sprite.get_flip_y();
-                FlipState(flip_x, flip_y)
+                S::FlipState(flip_x, flip_y)
             },
             FlipY(flip_y) => {
                 let flip_x = sprite.get_flip_x();
-                FlipState(flip_x, flip_y)
+                S::FlipState(flip_x, flip_y)
             },
             Show => {
-                VisibilityState(true)
+                S::VisibilityState(true)
             },
             Hide => {
-                VisibilityState(false)
+                S::VisibilityState(false)
             },
             ToggleVisibility => {
                 let visible = sprite.get_visible();
-                VisibilityState(!visible)
+                S::VisibilityState(!visible)
             },
             Blink(dur, times) => {
-                BlinkState(0.0, dur, 0, 2 * times)
+                S::BlinkState(0.0, dur, 0, 2 * times)
             },
             FadeIn(dur) => {
                 let b = sprite.get_opacity() as f64;
-                FadeState(0.0, b, 1.0 - b, dur)
+                S::FadeState(0.0, b, 1.0 - b, dur)
             },
             FadeOut(dur) => {
                 let b = sprite.get_opacity() as f64;
-                FadeState(0.0, b, 0.0 - b, dur)
+                S::FadeState(0.0, b, 0.0 - b, dur)
             },
             FadeTo(dur, d) => {
                 let b = sprite.get_opacity() as f64;
-                FadeState(0.0, b, d - b, dur)
+                S::FadeState(0.0, b, d - b, dur)
             },
             Ease(f, ref animation) => {
-                EaseState(f, Box::new(animation.to_state(sprite)))
+                S::EaseState(f, Box::new(animation.to_state(sprite)))
             },
         }
     }
@@ -176,6 +166,8 @@ impl AnimationState {
         sprite: &mut Sprite<I>,
         dt: f64
     ) -> (Option<AnimationState>, Status, f64) {
+        use AnimationState::*;
+
         match *self {
             MoveState(t, bx, by, cx, cy, d) => {
                 let factor = (t + dt) / d;
@@ -249,7 +241,7 @@ impl AnimationState {
                 }
 
                 if let Some(state) = state {
-                    (Some(EaseState(f, Box::new(state))),
+                    (Some(AnimationState::EaseState(f, Box::new(state))),
                      status, remain)
                 } else {
                     (None, status, remain)
@@ -274,7 +266,7 @@ fn update_position<I: ImageSize>(
         (None, Success, t - d)
     } else {
         sprite.set_position(bx + cx * factor, by + cy * factor);
-        (Some(MoveState(t, bx, by, cx, cy, d)),
+        (Some(AnimationState::MoveState(t, bx, by, cx, cy, d)),
          Running, 0.0)
     }
 }
@@ -292,7 +284,7 @@ fn update_rotation<I: ImageSize>(
         (None, Success, t - d)
     } else {
         sprite.set_rotation(b + c * factor);
-        (Some(RotateState(t, b, c, d)),
+        (Some(AnimationState::RotateState(t, b, c, d)),
          Running, 0.0)
     }
 }
@@ -312,7 +304,7 @@ fn update_scale<I: ImageSize>(
         (None, Success, t - d)
     } else {
         sprite.set_scale(bx + cx * factor, by + cy * factor);
-        (Some(ScaleState(t, bx, by, cx, cy, d)),
+        (Some(AnimationState::ScaleState(t, bx, by, cx, cy, d)),
          Running, 0.0)
     }
 }
@@ -330,7 +322,7 @@ fn update_opacity<I: ImageSize>(
         (None, Success, t - d)
     } else {
         sprite.set_opacity((b + c * factor) as f32);
-        (Some(FadeState(t, b, c, d)),
+        (Some(AnimationState::FadeState(t, b, c, d)),
          Running, 0.0)
     }
 }
