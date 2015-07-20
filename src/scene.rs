@@ -52,16 +52,16 @@ impl<I: ImageSize> Scene<I> {
                 }
 
                 let sprite = self.child_mut(id).unwrap();
-                let (status, _) = a.event(e, &mut |_, dt, animation, s| {
+                let (status, _) = a.event(e, &mut |args| {
                     let (state, status, remain) = {
                         let start_state;
-                        let state = match *s {
-                            None => { start_state = animation.to_state(sprite); &start_state },
-                            Some(ref state) => state,
+                        let state = match args.state {
+                            &mut None => { start_state = args.action.to_state(sprite); &start_state },
+                            &mut Some(ref state) => state,
                         };
-                        state.update(sprite, dt)
+                        state.update(sprite, args.dt)
                     };
-                    *s = state;
+                    *args.state = state;
                     (status, remain)
                 });
 
