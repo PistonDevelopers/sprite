@@ -13,27 +13,8 @@ extern crate interpolation;
 pub use animation::{
     Animation,
     AnimationState,
-
-    MoveTo,
-    MoveBy,
-    RotateTo,
-    RotateBy,
-    ScaleTo,
-    ScaleBy,
-
-    FlipX,
-    FlipY,
-
-    Show,
-    Hide,
-    ToggleVisibility,
-    Blink,
-    FadeIn,
-    FadeOut,
-    FadeTo,
-
-    Ease,
 };
+pub use animation::Animation::*;
 pub use scene::Scene;
 pub use sprite::Sprite;
 pub use interpolation::EaseFunction;

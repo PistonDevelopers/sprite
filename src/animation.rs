@@ -10,25 +10,6 @@ use ai_behavior::{
 use interpolation::EaseFunction;
 use sprite::Sprite;
 
-pub use animation::Animation::{
-    MoveTo,
-    MoveBy,
-    RotateTo,
-    RotateBy,
-    ScaleTo,
-    ScaleBy,
-    FlipX,
-    FlipY,
-    Show,
-    Hide,
-    ToggleVisibility,
-    Blink,
-    FadeIn,
-    FadeOut,
-    FadeTo,
-    Ease,
-};
-
 pub use animation::AnimationState::{
     MoveState,
     RotateState,
@@ -100,6 +81,8 @@ pub enum Animation {
 impl Animation {
     /// Generate a new state from Animation with specified Sprite
     pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> AnimationState {
+        use Animation::*;
+
         match *self {
             MoveTo(dur, dx, dy) => {
                 let (bx, by) = sprite.get_position();
