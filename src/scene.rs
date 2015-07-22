@@ -4,7 +4,7 @@ use uuid::Uuid;
 use graphics::{ Graphics, ImageSize };
 use graphics::math::{ Matrix2d };
 
-use event::GenericEvent;
+use input::GenericEvent;
 use ai_behavior::{
     Behavior,
     State,

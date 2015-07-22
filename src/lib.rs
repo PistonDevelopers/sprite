@@ -6,7 +6,7 @@
 
 extern crate uuid;
 extern crate ai_behavior;
-extern crate event;
+extern crate input;
 extern crate graphics;
 extern crate interpolation;
 
