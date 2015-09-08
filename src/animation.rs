@@ -212,21 +212,21 @@ impl AnimationState {
             },
             Ease(f, ref state) => {
                 let mut support_ease = true;
-                let (state, status, remain) = match &**state {
-                    &Move(t, bx, by, cx, cy, d) => {
+                let (state, status, remain) = match **state {
+                    Move(t, bx, by, cx, cy, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_position(sprite, factor, t + dt,
                                         bx, by, cx, cy, d)
                     },
-                    &Rotate(t, b, c, d) => {
+                    Rotate(t, b, c, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_rotation(sprite, factor, t + dt, b, c, d)
                     },
-                    &Scale(t, bx, by, cx, cy, d) => {
+                    Scale(t, bx, by, cx, cy, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
                     },
-                    &Fade(t, b, c, d) => {
+                    Fade(t, b, c, d) => {
                         let factor = ::interpolation::Ease::calc((t + dt) / d, f);
                         update_opacity(sprite, factor, t + dt, b, c, d)
                     },
