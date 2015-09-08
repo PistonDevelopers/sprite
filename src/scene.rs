@@ -55,9 +55,9 @@ impl<I: ImageSize> Scene<I> {
                 let (status, _) = a.event(e, &mut |args| {
                     let (state, status, remain) = {
                         let start_state;
-                        let state = match args.state {
-                            &mut None => { start_state = args.action.to_state(sprite); &start_state },
-                            &mut Some(ref state) => state,
+                        let state = match *args.state {
+                            None => { start_state = args.action.to_state(sprite); &start_state },
+                            Some(ref state) => state,
                         };
                         state.update(sprite, args.dt)
                     };
@@ -74,7 +74,7 @@ impl<I: ImageSize> Scene<I> {
                 }
             }
 
-            if new_animations.len() > 0 {
+            if !new_animations.is_empty() {
                 self.running.insert(id, new_animations);
             }
         }
@@ -82,14 +82,14 @@ impl<I: ImageSize> Scene<I> {
 
     /// Render this scene
     pub fn draw<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B) {
-        for child in self.children.iter() {
+        for child in &self.children {
             child.draw(t, b);
         }
     }
 
     /// Render this scene with tint
     pub fn draw_tinted<B: Graphics<Texture = I>>(&self, t: Matrix2d, b: &mut B, c: [f32;3]) {
-        for child in self.children.iter() {
+        for child in &self.children {
             child.draw_tinted(t,b,c)
         }
     }
@@ -108,8 +108,7 @@ impl<I: ImageSize> Scene<I> {
     fn find(&self, sprite_id: Uuid, animation: &Behavior<Animation>) -> Option<usize> {
         let mut index = None;
         if let Some(animations) = self.running.get(&sprite_id) {
-            for i in 0..animations.len() {
-                let (ref b, _, _) = animations[i];
+            for (i, &(ref b, _, _)) in animations.iter().enumerate() {
                 if b == animation {
                     index = Some(i);
                     break;
@@ -161,7 +160,7 @@ impl<I: ImageSize> Scene<I> {
     /// Get all the running animations in the scene
     pub fn running(&self) -> usize {
         let mut total = 0;
-        for (_, animations) in self.running.iter() {
+        for (_, animations) in &self.running {
             total += animations.len();
         }
         total
@@ -195,7 +194,7 @@ impl<I: ImageSize> Scene<I> {
             }
             Some(removed)
         } else {
-            for child in self.children.iter_mut() {
+            for child in &mut self.children {
                 if let Some(c) = child.remove_child(id.clone()) {
                     return Some(c);
                 }
@@ -215,7 +214,7 @@ impl<I: ImageSize> Scene<I> {
         if let Some(index) = self.children_index.get(&id) {
             Some(&self.children[*index])
         } else {
-            for child in self.children.iter() {
+            for child in &self.children {
                 if let Some(c) = child.child(id.clone()) {
                     return Some(c);
                 }
@@ -229,7 +228,7 @@ impl<I: ImageSize> Scene<I> {
         if let Some(index) = self.children_index.get(&id) {
             Some(&mut self.children[*index])
         } else {
-            for child in self.children.iter_mut() {
+            for child in &mut self.children {
                 if let Some(c) = child.child_mut(id.clone()) {
                     return Some(c);
                 }

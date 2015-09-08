@@ -220,7 +220,7 @@ impl<I: ImageSize> Sprite<I> {
             }
             Some(removed)
         } else {
-            for child in self.children.iter_mut() {
+            for child in &mut self.children {
                 if let Some(c) = child.remove_child(id.clone()) {
                     return Some(c);
                 }
@@ -234,7 +234,7 @@ impl<I: ImageSize> Sprite<I> {
         if let Some(index) = self.children_index.get(&id) {
             Some(&self.children[*index])
         } else {
-            for child in self.children.iter() {
+            for child in &self.children {
                 if let Some(c) = child.child(id.clone()) {
                     return Some(c);
                 }
@@ -248,7 +248,7 @@ impl<I: ImageSize> Sprite<I> {
         if let Some(index) = self.children_index.get(&id) {
             Some(&mut self.children[*index])
         } else {
-            for child in self.children.iter_mut() {
+            for child in &mut self.children {
                 if let Some(c) = child.child_mut(id.clone()) {
                     return Some(c);
                 }
@@ -303,7 +303,7 @@ impl<I: ImageSize> Sprite<I> {
         // for debug: anchor point
         //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
 
-        for child in self.children.iter() {
+        for child in &self.children {
             child.draw(transformed, b);
         }
     }
@@ -348,7 +348,7 @@ impl<I: ImageSize> Sprite<I> {
         // for debug: anchor point
         //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);
 
-        for child in self.children.iter() {
+        for child in &self.children {
             child.draw_tinted(transformed, b, c);
         }
     }
