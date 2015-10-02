@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashSet,HashMap};
 use uuid::Uuid;
 
 use graphics::{ Graphics, ImageSize };
@@ -24,6 +24,8 @@ pub struct Scene<I: ImageSize> {
     children_index: HashMap<Uuid, usize>,
     running: HashMap<Uuid,
         Vec<(Behavior<Animation>, State<Animation, AnimationState>, bool)>>,
+    // Set of sprites that should be removed once animations have finished.
+    dead_sprites: HashSet<Uuid>,
 }
 
 impl<I: ImageSize> Scene<I> {
@@ -33,6 +35,7 @@ impl<I: ImageSize> Scene<I> {
             children: Vec::new(),
             children_index: HashMap::new(),
             running: HashMap::new(),
+            dead_sprites: HashSet::new(),
         }
     }
 
@@ -76,6 +79,27 @@ impl<I: ImageSize> Scene<I> {
 
             if !new_animations.is_empty() {
                 self.running.insert(id, new_animations);
+            }
+        }
+
+        self.prune_dead_sprites();
+    }
+
+    fn prune_dead_sprites(&mut self) {
+        if !self.dead_sprites.is_empty() {
+            let mut to_remove = HashSet::new();
+
+            for sprite_id in self.dead_sprites.iter() {
+                let n = self.running_for_child(*sprite_id)
+                    .expect("Assert failed: invalid internal state for dead_sprites");
+
+                if n == 0 {
+                    to_remove.insert(*sprite_id);
+                }
+            }
+
+            for sprite_id in to_remove.iter() {
+                self.remove_child(*sprite_id);
             }
         }
     }
@@ -166,6 +190,20 @@ impl<I: ImageSize> Scene<I> {
         total
     }
 
+    /// Get the number of running animations for a sprite. If sprite does not
+    /// exist, returns None.
+    pub fn running_for_child(&self, sprite_id: Uuid) -> Option<usize> {
+        if let Some(animations) = self.running.get(&sprite_id) {
+            Some(animations.len())
+        } else {
+            if self.child(sprite_id).is_some() {
+                Some(0)
+            } else {
+                None
+            }
+        }
+    }
+
     /// Add sprite to scene
     pub fn add_child(&mut self, sprite: Sprite<I>) -> Uuid {
         let id = sprite.id();
@@ -203,10 +241,28 @@ impl<I: ImageSize> Scene<I> {
         };
 
         if removed.is_some() {
+            self.dead_sprites.remove(&id);
             self.stop_all_including_children(removed.as_ref().unwrap());
         }
 
         removed
+    }
+
+    /// Remove the child by `id` from the scene's children or grandchild once
+    /// all of its animations have finished. If the child current has no
+    /// animations, it is removed immediately. Children with paused animations
+    /// will not be removed until the animations are resumed and completed.
+    pub fn remove_child_when_done(&mut self, id: Uuid) {
+        match self.running_for_child(id) {
+            Some(n) => {
+                if n == 0 {
+                    self.remove_child(id);
+                } else {
+                    self.dead_sprites.insert(id);
+                }
+            },
+            None => {}
+        }
     }
 
     /// Find the child by `id` from the scene's children or grandchild
