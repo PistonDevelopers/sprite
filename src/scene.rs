@@ -292,4 +292,10 @@ impl<I: ImageSize> Scene<I> {
             None
         }
     }
+
+    /// Get the list of top-level (non-child) sprites.
+    #[inline(always)]
+    pub fn children(&self) -> &Vec<Sprite<I>> {
+        &self.children
+    }
 }
