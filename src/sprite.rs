@@ -290,7 +290,7 @@ impl<I: ImageSize> Sprite<I> {
             model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
         }
 
-        let draw_state = default_draw_state();
+        let ref draw_state: graphics::DrawState = Default::default();
 
         // for debug: bounding_box
         //model.rgb(1.0, 0.0, 0.0).draw(b);
@@ -335,7 +335,7 @@ impl<I: ImageSize> Sprite<I> {
             model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
         }
 
-        let draw_state = default_draw_state();
+        let ref draw_state: graphics::DrawState = Default::default();
 
         // for debug: bounding_box
         //model.rgb(1.0, 0.0, 0.0).draw(b);
