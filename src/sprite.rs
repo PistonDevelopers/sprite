@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 use graphics::{ self, Graphics, ImageSize };
 use graphics::math::{ Scalar, Matrix2d, Vec2d };
+use graphics::types::SourceRectangle;
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
@@ -28,6 +29,7 @@ pub struct Sprite<I: ImageSize> {
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, usize>,
 
+    src_rect: Option<SourceRectangle>,
     texture: Rc<I>,
 }
 
@@ -52,10 +54,38 @@ impl<I: ImageSize> Sprite<I> {
             opacity: 1.0,
 
             texture: texture,
+            src_rect: None,
 
             children: Vec::new(),
             children_index: HashMap::new(),
         }
+    }
+
+    /// Create sprite from a rectangle selection of a texture
+    pub fn from_texture_rect(texture: Rc<I>, src_rect: SourceRectangle) -> Sprite<I> {
+        Sprite {
+            id: Uuid::new_v4(),
+
+            visible: true,
+
+            anchor: [0.5, 0.5],
+
+            position: [0.0, 0.0],
+            rotation: 0.0,
+            scale: [1.0, 1.0],
+            color: [1.0,1.0,1.0],
+
+            flip_x: false,
+            flip_y: false,
+
+            opacity: 1.0,
+
+            texture: texture,
+            src_rect: From::from(src_rect),
+
+            children: Vec::new(),
+            children_index: HashMap::new(),
+        }        
     }
 
     /// Get the sprite's id
@@ -188,6 +218,18 @@ impl<I: ImageSize> Sprite<I> {
         self.opacity = opacity;
     }
 
+    /// Get the sprite's source rectangle
+    #[inline(always)]
+    pub fn get_src_rect(&self) -> Option<SourceRectangle> {
+        self.src_rect
+    }
+    
+    /// Set the sprite's source rectangle
+    #[inline(always)]
+    pub fn set_src_rect(&mut self, src_rect: SourceRectangle) {
+        self.src_rect = From::from(src_rect);
+    }
+
     /// Get the sprite's texture
     #[inline(always)]
     pub fn get_texture(&self) -> &Rc<I> {
@@ -271,10 +313,14 @@ impl<I: ImageSize> Sprite<I> {
             return;
         }
 
-        let (w, h) = self.texture.get_size();
-        let w = w as f64;
-        let h = h as f64;
-        let anchor = [self.anchor[0] * w, self.anchor[1] * h];
+        let (tex_w, tex_h) = self.texture.get_size();
+        let tex_w = tex_w as f64;
+        let tex_h = tex_h as f64;
+        let source_rectangle = self.src_rect.unwrap_or({
+            let (w, h) = (tex_w, tex_h);
+            [0.0, 0.0, w as f64, h as f64]
+        });        
+        let anchor = [self.anchor[0] * source_rectangle[2], self.anchor[1] * source_rectangle[3]];
 
         let transformed = t.trans(self.position[0], self.position[1])
                            .rot_deg(self.rotation)
@@ -283,11 +329,11 @@ impl<I: ImageSize> Sprite<I> {
         let mut model = transformed;
 
         if self.flip_x {
-            model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
+            model = model.trans(source_rectangle[2] - 2.0 * anchor[0], 0.0).flip_h();
         }
 
         if self.flip_y {
-            model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
+            model = model.trans(0.0, source_rectangle[3] - 2.0 * anchor[1]).flip_v();
         }
 
         let ref draw_state: graphics::DrawState = Default::default();
@@ -297,7 +343,8 @@ impl<I: ImageSize> Sprite<I> {
 
         graphics::Image::new()
             .color([self.color[0], self.color[1], self.color[2], self.opacity])
-            .rect([-anchor[0], -anchor[1], w, h])
+            .rect([-anchor[0], -anchor[1], source_rectangle[2], source_rectangle[3]])
+            .maybe_src_rect(self.src_rect)
             .draw(&*self.texture, draw_state, model, b);
 
         // for debug: anchor point
@@ -316,10 +363,14 @@ impl<I: ImageSize> Sprite<I> {
             return;
         }
 
-        let (w, h) = self.texture.get_size();
-        let w = w as f64;
-        let h = h as f64;
-        let anchor = [self.anchor[0] * w, self.anchor[1] * h];
+        let (tex_w, tex_h) = self.texture.get_size();
+        let tex_w = tex_w as f64;
+        let tex_h = tex_h as f64;
+        let source_rectangle = self.src_rect.unwrap_or({
+            let (w, h) = (tex_w, tex_h);
+            [0.0, 0.0, w as f64, h as f64]
+        });        
+        let anchor = [self.anchor[0] * source_rectangle[2], self.anchor[1] * source_rectangle[3]];
 
         let transformed = t.trans(self.position[0], self.position[1])
                            .rot_deg(self.rotation)
@@ -328,13 +379,13 @@ impl<I: ImageSize> Sprite<I> {
         let mut model = transformed;
 
         if self.flip_x {
-            model = model.trans(w - 2.0 * anchor[0], 0.0).flip_h();
+            model = model.trans(source_rectangle[2] - 2.0 * anchor[0], 0.0).flip_h();
         }
 
         if self.flip_y {
-            model = model.trans(0.0, h - 2.0 * anchor[1]).flip_v();
+            model = model.trans(0.0, source_rectangle[3] - 2.0 * anchor[1]).flip_v();
         }
-
+        
         let ref draw_state: graphics::DrawState = Default::default();
 
         // for debug: bounding_box
@@ -342,7 +393,8 @@ impl<I: ImageSize> Sprite<I> {
 
         graphics::Image::new()
             .color([c[0], c[1], c[2], self.opacity])
-            .rect([-anchor[0], -anchor[1], w, h])
+            .rect([-anchor[0], -anchor[1], source_rectangle[2], source_rectangle[3]])
+            .maybe_src_rect(self.src_rect)
             .draw(&*self.texture, draw_state, model, b);
 
         // for debug: anchor point
@@ -357,14 +409,18 @@ impl<I: ImageSize> Sprite<I> {
     /// Get the sprite's bounding box
     pub fn bounding_box(&self) -> graphics::types::Rectangle {
         let (w, h) = self.texture.get_size();
-        let w = w as f64 * self.scale[0];
-        let h = h as f64 * self.scale[1];
+        let source_rectangle = self.src_rect.unwrap_or({
+            let (sprite_w, sprite_h) = (w, h);
+            [0.0, 0.0, sprite_w as f64, sprite_h as f64]
+        });                
+        let sprite_w = source_rectangle[2] * self.scale[0];
+        let sprite_h = source_rectangle[3] * self.scale[1];
 
         [
-            self.position[0] - self.anchor[0] * w,
-            self.position[1] - self.anchor[1] * h,
-            w,
-            h
+            self.position[0] - self.anchor[0] * sprite_w,
+            self.position[1] - self.anchor[1] * sprite_h,
+            sprite_w,
+            sprite_h
         ]
     }
 }
