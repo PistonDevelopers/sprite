@@ -6,6 +6,7 @@ extern crate input;
 extern crate graphics;
 
 use std::rc::Rc;
+use std::cell::RefCell;
 use ai_behavior::{Action};
 
 use sprite::*;
@@ -61,6 +62,30 @@ fn remove_child_when_done_when_animations_paused() {
     scene.remove_child_when_done(id);
 
     assert!(scene.child(id).is_some());
+}
+
+#[test]
+fn execute_custom_function() {
+
+    let mut scene: Scene<FakeTexture> = Scene::new();
+    let sprite = Sprite::from_texture(Rc::new(FakeTexture::new()));
+
+    let local_copy = Rc::new(RefCell::new(0));
+    let send_copy = local_copy.clone();
+
+    let id = scene.add_child(sprite);
+    let animation = Action(Function(custom_function(move || {
+        *send_copy.borrow_mut() = 1;
+    })));
+    scene.run(id, &animation);
+    scene.remove_child_when_done(id);
+
+    assert!(scene.child(id).is_some());
+
+    scene.event(&dt_event(0.2)); // Advance any amount of time 
+
+    assert!(*(local_copy.borrow()) == 1);
+    assert!(scene.child(id).is_none());
 }
 
 fn dt_event(dt: f64) -> input::Input {

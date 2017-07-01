@@ -13,6 +13,7 @@ extern crate interpolation;
 pub use animation::{
     Animation,
     AnimationState,
+    custom_function
 };
 pub use animation::Animation::*;
 pub use scene::Scene;

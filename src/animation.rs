@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use graphics::ImageSize;
 use graphics::math::Scalar;
 
@@ -9,6 +10,46 @@ use ai_behavior::{
 
 use interpolation::EaseFunction;
 use sprite::Sprite;
+
+pub struct FuncImpl<F : Fn()>{
+    f: F
+}
+
+
+/// creates a custom function to be triggered 
+/// during animations 
+/// This function takes care of the boilerplate required to fullfill 
+/// trait requirements.
+pub fn custom_function<F : Fn() + 'static>(f: F) -> Rc<Box<Func>>
+{
+    Rc::new(
+        Box::new(
+            FuncImpl{
+                f: f,
+            }
+        )
+    )
+}
+
+/// trait to allow multiple closures to be called from the same 
+/// Function Animation State
+pub trait Func{
+    fn execute(&self);
+}
+
+impl<F> Func for FuncImpl<F>
+where F : Fn()
+{
+    fn execute(&self){
+        (self.f)()
+    }
+}
+
+impl PartialEq for Func{
+    fn eq(&self, other: &Func) -> bool{
+        return self as *const _ ==  other as *const _;
+    }
+}
 
 /// Animations supported by Sprite
 #[derive(Clone, PartialEq)]
@@ -65,6 +106,14 @@ pub enum Animation {
     ///
     /// Tweening the animation with ease function
     Ease(EaseFunction, Box<Animation>),
+
+    /// custom_function
+    /// 
+    /// Execute custom code:
+    /// The Rc makes the type clonable, 
+    /// The box allows us to have different initializations using different
+    /// closures. Use the custom_function function to instanciate your callback
+    Function(Rc<Box<Func>>),
 }
 
 impl Animation {
@@ -134,6 +183,9 @@ impl Animation {
             Ease(f, ref animation) => {
                 S::Ease(f, Box::new(animation.to_state(sprite)))
             },
+            Function(ref f) => {
+                S::Function(f.clone())
+            },
         }
     }
 }
@@ -157,6 +209,8 @@ pub enum AnimationState {
     Fade(f64, f64, f64, f64),
     /// ease_function, animation
     Ease(EaseFunction, Box<AnimationState>),
+    /// Custom function
+    Function(Rc<Box<Func>>),
 }
 
 impl AnimationState {
@@ -246,6 +300,10 @@ impl AnimationState {
                 } else {
                     (None, status, remain)
                 }
+            },
+            Function(ref f) => {
+                f.execute();
+                (None, Success, dt)
             },
         }
     }
