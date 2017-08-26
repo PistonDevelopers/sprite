@@ -63,9 +63,11 @@ fn remove_child_when_done_when_animations_paused() {
     assert!(scene.child(id).is_some());
 }
 
-fn dt_event(dt: f64) -> input::Input {
-    let event = input::Input::Update(input::UpdateArgs { dt: 0.0 });
-    let event: input::Input = input::UpdateEvent::from_dt(dt, &event).unwrap();
+fn dt_event(dt: f64) -> input::Event {
+    use input::{Event, UpdateArgs, UpdateEvent};
+
+    let event: Event = UpdateArgs { dt: 0.0 }.into();
+    let event: Event = UpdateEvent::from_dt(dt, &event).unwrap();
 
     event
 }
