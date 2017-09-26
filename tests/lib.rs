@@ -3,7 +3,6 @@ mod fake_texture;
 extern crate sprite;
 extern crate ai_behavior;
 extern crate input;
-extern crate graphics;
 
 use std::rc::Rc;
 use ai_behavior::{Action};
