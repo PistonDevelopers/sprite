@@ -24,4 +24,4 @@ pistoncore-input = "0.20.0"
 interpolation = "0.1.0"
 piston2d-graphics = "0.26.0"
 piston-ai_behavior = "0.22.0"
-+uuid = { version = "0.6", features = ["v4"] } 
+uuid = { version = "0.6", features = ["v4"] } 
