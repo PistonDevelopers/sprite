@@ -1,4 +1,5 @@
 use std::collections::{HashSet,HashMap};
+use std::mem;
 use uuid::Uuid;
 
 use graphics::{ Graphics, ImageSize };
@@ -42,8 +43,7 @@ impl<I: ImageSize> Scene<I> {
     /// Update animation's state
     pub fn event<E>(&mut self, e: &E) where E: GenericEvent {
         // regenerate the animations and their states
-        let running = self.running.clone();
-        self.running.clear();
+        let running = mem::take(&mut self.running);
 
         for (id, animations) in running.into_iter() {
             let mut new_animations = Vec::new();
