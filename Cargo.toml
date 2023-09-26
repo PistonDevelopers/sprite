@@ -1,7 +1,7 @@
 [package]
 
 name = "piston2d-sprite"
-version = "0.67.0"
+version = "0.68.0"
 authors = [
     "Coeuvre Wong <coeuvre@gmail.com>",
     "zummenix",
@@ -22,7 +22,7 @@ path = "./src/lib.rs"
 
 [dependencies]
 pistoncore-input = "1.0.0"
-interpolation = "0.2.0"
-piston2d-graphics = "0.43.0"
+interpolation = "0.3.0"
+piston2d-graphics = "0.44.0"
 piston-ai_behavior = "0.33.0"
 uuid = { version = "0.6", features = ["v4"] } 
